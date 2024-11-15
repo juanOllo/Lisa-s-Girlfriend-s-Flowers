@@ -14,12 +14,11 @@
 int main() {
 	srand(time(NULL));//Sirve para q rand() no de siempre los mismos numeros randoms
 
-	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Presiona una tecla para jugar..\n");		
-	printf("\n 22 \n");
-
     // MAIN MENU
     int op = 0;
 	do{
+        system("cls");
+		printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");		
         printf("\n\nOPCIONES\n 1.JUGAR\n 2.CONFIG\n 3.SALIR");
         char opc = getch();
 	    op = atoi(&opc);
