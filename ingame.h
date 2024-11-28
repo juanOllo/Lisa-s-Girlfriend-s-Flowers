@@ -64,11 +64,11 @@ int dibujarEscena(char d[max][max2], int loc);
 void playGame() {
 
 	/////////////////////////CARGA DE ESCENAS/////////////////
-    /**/ cargaDeEscena(escCasa, 35);
-	/**/ cargaDeEscena(escCasaLimit, 52);
+    /**/ cargaDeEscena(escCasa, 1);
+	/**/ cargaDeEscena(escCasaLimit, 18);
 	/**/ 
-    /**/ cargaDeEscena(escCalle, 1);
-	/**/ cargaDeEscena(escCalleLimit, 18);
+    /**/ cargaDeEscena(escCalle, 35);
+	/**/ cargaDeEscena(escCalleLimit, 52);
 	// /**/ cargaDeEscena(casaDeVecino, 120);
 	/////////////////////////////////////////////////////////
 	
@@ -77,13 +77,13 @@ void playGame() {
 	/**/ NDL.ubi.x = 31;		//NDL por primera vez en el juego
     /**/ NDL.ubi.y = 6;
 	/**/
-    /**/ flor.x = 46;	//FLOR
+    /**/ flor.x = 46;			//FLOR
     /**/ flor.y = 10;
     /**/
     /**/ puertaACalle.x = 56;	//PUERTA A LA CALLE
     /**/ puertaACalle.y = 6;
     /**/
-    /**/ curas.x = 23;	//CURAS (HEALT)
+    /**/ curas.x = 23;			//CURAS (HEALT)
     /**/ curas.y = 4;
 	////////////////////////////////////////////////////////////////
 
@@ -110,17 +110,17 @@ void playGame() {
 	/**/ entyCoor[11].x= 35;		//vecino 1
 	/**/ entyCoor[11].y= 13;
 	/**/ entyCoor[12].x= 31;		//vecino 2
-	/**/ entyCoor[12].y= 12;	
+	/**/ entyCoor[12].y= 12;
+	/**/ entyCoor[13].x= 41;		//vecino 3
+	/**/ entyCoor[13].y= 12;	
 	////////////////////////////////////////////////////////////////
 
 
-    // int op = 0;
 	// PRIMERO LLAMA AL MENU DE CASA
 	int op = menuDeCasa();
 
 	do{
-
-		// CADA MENU DEVUELVE UN NRO QUE INDICA A Q NUEVA ESCENA VA EL PERSONAJE
+		// CADA MENU DEVUELVE UN NRO QUE INDICA A Q NUEVA ESCENA/MENU VA EL PERSONAJE
 		switch(op){
 			case 1: {
 				// menuDeCasa
@@ -164,13 +164,13 @@ void playGame() {
 
 
 int menuDeCasa(){
-    int estadoEnCasa = 0;
+    int estadoEnCalleEnCasa = 0;
     	
         //Unica utilizacion de int primeraVez
 		// CADA VEZ QUE PIERDAS TODA LA ENERGIA LISA TE MANDA UN MENSAJE
 		// 		faltan checkeos pero creo q ya anda
 			// if(NDL.HP < 100){
-        	// 	estadoEnCasa = dibujarEscena(escCasa, 1);
+        	// 	estadoEnCalleEnCasa = dibujarEscena(escCasa, 1);
 
 			// 	switch (NDL.primeraVez){
 			// 		case 0:
@@ -201,16 +201,16 @@ int menuDeCasa(){
     
     //system ("/bin/stty raw"); //FUNCIONA PARA Q GETCHAR() FUNCIONE EN UBUNTU
     
-    while(casaInput != 'p'){
+    while(casaInput != 'p' && casaInput != 'P'){
         system("cls");
         // printf("Ubicacion: %d %d \n", NDL.ubi.x, NDL.ubi.y); //Ubicasion de la novia d lisa
         //printf("Ubicacion enemi: %d %d \n", eubi.x, eubi.y); //ubicasion de las abejas
 
 		//	DEVUELVE 1 SI SALISTE A LA CALLE
 		//	SINO DEVUELVE 0
-        estadoEnCasa = dibujarEscena(escCasa, 1);
+        estadoEnCalleEnCasa = dibujarEscena(escCasa, 1);
         
-        switch(estadoEnCasa){
+        switch(estadoEnCalleEnCasa){
             case 0:
                 casaInput = getch();
                 break;
@@ -261,15 +261,20 @@ int menuDeCalle (){
 	// CARGA LA CALLE A LA QUE LLEGASTE
 	switch (NDL.calleLoc){
 		case 1:
-			cargaDeEscena(escCalle, 1);
-			cargaDeEscena(escCalleLimit, 18);
+			cargaDeEscena(escCalle, 35);
+			cargaDeEscena(escCalleLimit, 52);
 			break;
 
 		case 2:
 			cargaDeEscena(escCalle, 69);
 			cargaDeEscena(escCalleLimit, 86);
 			break;
-		
+
+		case 3:
+			cargaDeEscena(escCalle, 103);
+			cargaDeEscena(escCalleLimit, 120);
+			break;	
+
 		default:
 			break;
 	}
@@ -284,15 +289,15 @@ int menuDeCalle (){
 	/**/ entyCoor[3].y= 4;
 
 	//system ("cls");
-	int estado;
+	int estadoEnCalle;
 	char calleInput;
 
 	do{
 		system("cls");
-		estado = dibujarEscena(escCalle, 2);
+		estadoEnCalle = dibujarEscena(escCalle, 2);
         // printf("Ubicacion: %d %d \n", NDL.ubi.x, NDL.ubi.y); //Ubicasion de la novia d lisa
 
-		// printf("\nEstado: %d\n", estado);
+		// printf("\nEstadoEnCalle: %d\n", estadoEnCalle);
         
 		// printf("misionescumplidas: %d", NDL.misionesCumplidas);
 		// printf("misionescumplidas: %d", NDL.HP);
@@ -300,7 +305,7 @@ int menuDeCalle (){
 
 		// printf("NDL.calleLoc: %d", NDL.calleLoc);
 
-		switch(estado){
+		switch(estadoEnCalle){
 			case 0:
 				entyCoor[1] = randomUbi(entyCoor[1], escCalleLimit);
 				entyCoor[2] = randomUbi(entyCoor[2], escCalleLimit);
@@ -314,6 +319,9 @@ int menuDeCalle (){
 				break;
 		    case 2:
 				// TE ATRAPARON LAS ABEJAS, VOLVES A CASA
+				cinematica(18);
+				freeze(3);
+
 				NDL.cantFlores = 0;
 				NDL.ubi.x = 31;
     			NDL.ubi.y = 6;
@@ -323,7 +331,7 @@ int menuDeCalle (){
 				// ENTRAR A UN VECINO
 		        if(NDL.calleLoc-1 > NDL.misionesCumplidas){
 		            //system("cls");
-		            printf("XXXX Debes entregar la flor anterior XXXX\n");
+		            printf("\nXXXX Debes entregar la flor anterior XXXX\n");
 		        }
 		        else{
     		        if(NDL.calleLoc <= NDL.misionesCumplidas){
@@ -345,7 +353,6 @@ int menuDeCalle (){
 				break;
 			default:
 				break;
-		    
 		}
 
 		calleInput = getch();
@@ -353,7 +360,7 @@ int menuDeCalle (){
 		// MOVIMIENTO DE NDL
 		NDL.ubi = movimiento(calleInput, NDL.ubi, escCalleLimit, 1);
 		
-	}while(estado != 6);
+	}while(estadoEnCalle != 6);
 }
 
 
@@ -408,6 +415,10 @@ int menuDeVecino(){
 					freeze(1);
 					cinematica(52 + ((17*5) * NDL.misionesCumplidas));
 					freeze(1);
+					cinematica(69 + ((17*5) * NDL.misionesCumplidas));
+					freeze(1);
+					cinematica(222);	//animacion de la mano con la flor
+					freeze(2);
 					cinematica(69 + ((17*5) * NDL.misionesCumplidas));
 					freeze(1);
 					cinematica(86 + ((17*5) * NDL.misionesCumplidas));
@@ -490,7 +501,19 @@ int dibujarEscena(char d[max][max2], int loc){
     switch(loc){
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
         case 1:											//DIBUJA LA ESCENA DE LA CASA
-			// ESTE FOR SOLO DIBUJA LA ESCENA
+
+			// 		ESTOS IF CHEKEAN SI HACES CONTACTO CON ALGO
+			// AGARRASTE UNA FLOR
+            if(proximo(NDL.ubi, flor) == 1 && NDL.cantFlores == 0){
+				NDL.cantFlores = 1;
+            }
+
+			// COMISTE LOS CARAMELOS
+            if(proximo(NDL.ubi, curas) == 1 && NDL.HP < 100){
+				NDL.HP = 100;
+            }
+
+			// 		ESTE FOR SOLO DIBUJA LA ESCENA
             for(i = max-1; i > 0; i--){
                 printf("                              ");
                 for(j = 1; j < max2; j++){
@@ -514,44 +537,35 @@ int dibujarEscena(char d[max][max2], int loc){
                 printf("\n");
             }
 
+			//  (algunos if es mejor ponerlos desp de dibujar la escena)
+			// 		ESTOS IF CHEKEAN SI HACES CONTACTO CON ALGO
 			// SALISTE A LA CALLE POR LA PUERTA
 			if(proximo(NDL.ubi, puertaACalle) == 1){
 				return 1;
             }
 
-			// AGARRASTE UNA FLOR
-            if(proximo(NDL.ubi, flor) == 1 && NDL.cantFlores == 0){
-				NDL.cantFlores = 1;
-            }
-
-			// COMISTE LOS CARAMELOS
-            if(proximo(NDL.ubi, curas) == 1 && NDL.HP < 100){
-				NDL.HP = 100;
-            }
-            
-			// printf("\n\n\n\t\t\t\t\t   <3 ENERGIA: %d <3", NDL.HP);
-        	// printf("\tFLOR EN MANO: %d ,* \n\n", NDL.cantFlores);
-
+			// DIBUJA CANTIDAD DE ENERGIA
 			switch (NDL.HP){
-			case 100:
-				printf("\n\n\n\t\t\t\t\t\t    ENERGIA: [++++++++] \n");
-				break;
-			case 75:
-				printf("\n\n\n\t\t\t\t\t\t    ENERGIA: [++++++__] \n");
-				break;
-			case 50:
-				printf("\n\n\n\t\t\t\t\t\t    ENERGIA: [++++____] \n");
-				break;
-			case 25:
-				printf("\n\n\n\t\t\t\t\t\t    ENERGIA: [++______] \n");
-				break;
-			case 0:
-				printf("\n\n\n\t\t\t\t\t\t    ENERGIA: [________] \n");
-				break;
-			default:
-				break;
+				case 100:
+					printf("\n\n\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++++] \n");
+					break;
+				case 75:
+					printf("\n\n\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++__] \n");
+					break;
+				case 50:
+					printf("\n\n\n\t\t\t\t\t\tENERGIA SOCIAL: [++++____] \n");
+					break;
+				case 25:
+					printf("\n\n\n\t\t\t\t\t\tENERGIA SOCIAL: [++______] \n");
+					break;
+				case 0:
+					printf("\n\n\n\t\t\t\t\t\tENERGIA SOCIAL: [________] \n");
+					break;
+				default:
+					break;
 			}
 
+			printf("\e[?25l");	//ESCONDE EL "CURSOR"
             break;
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -576,6 +590,7 @@ int dibujarEscena(char d[max][max2], int loc){
                 printf("\n");
             }
 
+			// 		ESTOS IF CHEKEAN SI HACES CONTACTO CON ALGO
 			// ENTRAR A CASA
             if(proximo(NDL.ubi, entyCoor[10])==2 && NDL.calleLoc==1){
                 return 1;
@@ -589,8 +604,9 @@ int dibujarEscena(char d[max][max2], int loc){
 			// ENTRAR A VECINO 1 O 2
             if((proximo(NDL.ubi, entyCoor[11]) == 2 && NDL.calleLoc==1)
 				|| (proximo(NDL.ubi, entyCoor[12]) == 2 && NDL.calleLoc==2)
+				|| (proximo(NDL.ubi, entyCoor[13]) == 2 && NDL.calleLoc==3)
 			){
-                return 3;	
+                return 3;
             }
             
 			// 	ESTO ES PARA PASAR DE CALLE
@@ -607,6 +623,7 @@ int dibujarEscena(char d[max][max2], int loc){
 				return 4;
 			}
 
+			printf("\e[?25l");	//ESCONDE EL "CURSOR"
             break;
 
         default:

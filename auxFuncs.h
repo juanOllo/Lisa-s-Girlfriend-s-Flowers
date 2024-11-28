@@ -105,6 +105,11 @@ int proximo(coor u, coor e){
 
 
 
+
+
+
+
+
 //  DEVUELVE UNA UBI RANDOM DENTRO DE LOS LIMITES
 coor randomUbi(coor e, char limit[max][max2]){ 
 	// srand(time(NULL));//Sirve para q rand() no de siempre los mismos numeros randoms
@@ -121,53 +126,6 @@ coor randomUbi(coor e, char limit[max][max2]){
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-//  
-void cinematica(int l/*line*/){
-	FILE *f;
-    int i = 0;
-    int j = 0;
-    char aux;
-    int inicio = 0;
-    char linea[max2+1];
-    
-    f = fopen("cinematicas.txt", "r");
-    
-    while(inicio < l){
-        fscanf(f, "%c", &aux);
-		fscanf(f, "%c", &aux);
-        fgets(linea, sizeof(linea), f);
-        fscanf(f, "%c", &aux);
-        inicio++;
-    }
-
-	system("cls");
-    printf("\n\n\n\n\n\n\n");
-    
-    if(f != NULL){
-        for (i=1; i<=max*2-2; i++){
-			printf("                            ");
-			fscanf(f, "%c", &aux);
-            fgets(linea, sizeof(linea), f);
-			printf("%s", linea);
-        }
-    }
-    else{
-        printf("error");
-    }
-
-	fclose(f);
-}
-
 
 
 
@@ -232,7 +190,7 @@ void leerEscuchar(int cont){
 			}
 		}
 	}//while(i != 0);
-	printf("%s\n", dialogo);
+	printf("\t%s\n", dialogo);
 	//printf("\nTermina escuchar.\n");
 
 }
@@ -316,3 +274,169 @@ coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], in
         return movimientoAux;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//  
+void cinematica(int l/*line*/){
+	FILE *f;
+    int i = 0;
+    int j = 0;
+    char aux;
+    int inicio = 0;
+    char linea[max2+1];
+    
+    f = fopen("cinematicas.txt", "r");
+    
+    while(inicio < l){
+        fscanf(f, "%c", &aux);
+		fscanf(f, "%c", &aux);
+        fgets(linea, sizeof(linea), f);
+        fscanf(f, "%c", &aux);
+        inicio++;
+    }
+
+	system("cls");
+    printf("\n\n\n\n\n\n\n");
+    
+    if(f != NULL){
+        for (i=1; i<=max*2-2; i++){
+			printf("                            ");
+			fscanf(f, "%c", &aux);
+            fgets(linea, sizeof(linea), f);
+			printf("%s", linea);
+        }
+    }
+    else{
+        printf("error");
+    }
+
+	fclose(f);
+}
+
+// void cinematica2(int l/*line*/){
+// 	FILE *f;
+//     int i = 0;
+//     int j = 0;
+//     char aux;
+//     int inicio = 0;
+//     char linea[max2+1];
+    
+//     f = fopen("cinematicas.txt", "r");
+    
+//     while(inicio < l){
+//         fscanf(f, "%c", &aux);
+// 		fscanf(f, "%c", &aux);
+//         fgets(linea, sizeof(linea), f);
+//         fscanf(f, "%c", &aux);
+//         inicio++;
+//     }
+
+// 	system("cls");
+//     printf("\n\n\n\n\n\n\n");
+    
+//     if(f != NULL){
+// 			fscanf(f, "%c", &aux);
+//             fgets(linea, sizeof(linea), f);
+// 			printf("                            ");
+// 			printf("%s", linea);
+
+
+//         for (i=1; i<=(max/2)-1; i++){
+//             fscanf(f, "%c", &aux);
+//             fscanf(f, "%c", &aux);
+//             fscanf(f, "%c", &aux);
+//             fgets(linea, sizeof(linea), f);
+// 			// printf("\n%s", linea);
+// 			printf("\n");
+
+//             fscanf(f, "%c", &aux);
+//             fscanf(f, "%c", &aux);
+//             fscanf(f, "%c", &aux);
+//             fgets(linea, sizeof(linea), f);
+// 			printf("\n                            ");
+// 			printf("%s", linea);
+
+//         }
+//         printf("\n");
+//     }
+//     else{
+//         printf("error");
+//     }
+
+// 	fclose(f);
+// }
+
+// void cinematica3(int l/*line*/){
+// 	FILE *f;
+//     int i = 0;
+//     int j = 0;
+//     char aux;
+//     int inicio = 0;
+//     char linea[max2+1];
+    
+//     f = fopen("cinematicas.txt", "r");
+    
+//     while(inicio < l){
+//         fscanf(f, "%c", &aux);
+// 		fscanf(f, "%c", &aux);
+//         fgets(linea, sizeof(linea), f);
+//         fscanf(f, "%c", &aux);
+//         inicio++;
+//     }
+
+// 	system("cls");
+//     printf("\n\n\n\n\n\n\n");
+    
+//     if(f != NULL){
+// 			fscanf(f, "%c", &aux);
+//             fgets(linea, sizeof(linea), f);
+// 			printf("                            ");
+// 			printf("");
+
+
+//         for (i=1; i<=(max/3)-1; i++){
+
+//             fscanf(f, "%c", &aux);
+//             fscanf(f, "%c", &aux);
+//             fscanf(f, "%c", &aux);
+//             fgets(linea, sizeof(linea), f);
+// 			// printf("\n%s", linea);
+// 			printf("\n");
+            
+//             fscanf(f, "%c", &aux);
+//             fscanf(f, "%c", &aux);
+//             fscanf(f, "%c", &aux);
+//             fgets(linea, sizeof(linea), f);
+// 			printf("\n                            ");
+// 			printf("%s", linea);
+
+//             fscanf(f, "%c", &aux);
+//             fscanf(f, "%c", &aux);
+//             fscanf(f, "%c", &aux);
+//             fgets(linea, sizeof(linea), f);
+// 			// printf("\n%s", linea);
+// 			printf("\n");
+
+//         }
+//     }
+//     else{
+//         printf("error");
+//     }
+
+// 	fclose(f);
+// }

@@ -12,35 +12,35 @@
 #include "ingame.h"
 
 int main() {
-	srand(time(NULL));//Sirve para q rand() no de siempre los mismos numeros randoms
+	srand(time(NULL));	//Sirve para q rand() no de siempre los mismos numeros randoms
+						// todavia no probe si es necesario tenerlo aca
+
+    char op;
 
     // MAIN MENU
-    int op = 0;
 	do{
         system("cls");
 		printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");		
         printf("\n\nOPCIONES\n 1.JUGAR\n 2.CONFIG\n 3.SALIR");
-        char opc = getch();
-	    op = atoi(&opc);
+		printf("\e[?25l");	//ESCONDE EL "CURSOR"
+		op = getch();
 		switch(op){
-			case 1: {
+			case '1':
+				// COMENZAR A JUGAR
                 playGame();
 				break;
-			};
-			case 2: {
-                printf("config.");
+				
+			case '2':
+				// ABRIR CONFIG.
 				break;
-			}
-			case 3: {
-                printf("salir.");
-                return 0;
-				// break;
-			}
-			default: {
-				printf("Ingrese un valor entre 1 y 3.\n");
-                break;
-			}	
 
+			case '3':
+				// CERRAR EL JUEGO
+                return 0;
+
+			default:
+				// INGRESA UN VALOR ENTRE 1 Y 3
+                break;
 		};
 	}while(op != 7);
 
