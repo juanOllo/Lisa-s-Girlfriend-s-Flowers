@@ -164,13 +164,13 @@ void playGame() {
 
 
 int menuDeCasa(){
-    int estadoEnCalleEnCasa = 0;
+    int estadoEnCasa = 0;
     	
         //Unica utilizacion de int primeraVez
 		// CADA VEZ QUE PIERDAS TODA LA ENERGIA LISA TE MANDA UN MENSAJE
 		// 		faltan checkeos pero creo q ya anda
 			// if(NDL.HP < 100){
-        	// 	estadoEnCalleEnCasa = dibujarEscena(escCasa, 1);
+        	// 	estadoEnCasa = dibujarEscena(escCasa, 1);
 
 			// 	switch (NDL.primeraVez){
 			// 		case 0:
@@ -208,9 +208,9 @@ int menuDeCasa(){
 
 		//	DEVUELVE 1 SI SALISTE A LA CALLE
 		//	SINO DEVUELVE 0
-        estadoEnCalleEnCasa = dibujarEscena(escCasa, 1);
+        estadoEnCasa = dibujarEscena(escCasa, 1);
         
-        switch(estadoEnCalleEnCasa){
+        switch(estadoEnCasa){
             case 0:
                 casaInput = getch();
                 break;
