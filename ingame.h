@@ -113,6 +113,8 @@ void playGame() {
 	/**/ entyCoor[12].y= 12;
 	/**/ entyCoor[13].x= 41;		//vecino 3
 	/**/ entyCoor[13].y= 12;	
+	/**/ entyCoor[14].x= 31;		//vecino 4
+	/**/ entyCoor[14].y= 11;	
 	////////////////////////////////////////////////////////////////
 
 
@@ -273,6 +275,11 @@ int menuDeCalle (){
 		case 3:
 			cargaDeEscena(escCalle, 103);
 			cargaDeEscena(escCalleLimit, 120);
+			break;
+
+		case 4:
+			cargaDeEscena(escCalle, 137);
+			cargaDeEscena(escCalleLimit, 154);
 			break;	
 
 		default:
@@ -325,20 +332,21 @@ int menuDeCalle (){
 				NDL.cantFlores = 0;
 				NDL.ubi.x = 31;
     			NDL.ubi.y = 6;
+				NDL.HP = NDL.HP - 25; //iba a chekear q tuviera mas de 0 hp pero directamente no podes salir a la calle con 0 hp
 				return 1;
 				break;
 		    case 3:
 				// ENTRAR A UN VECINO
 		        if(NDL.calleLoc-1 > NDL.misionesCumplidas){
 		            //system("cls");
-		            printf("\nXXXX Debes entregar la flor anterior XXXX\n");
+		            printf("\nAVISO: Debes entregas la flor anterior.\n");
 		        }
 		        else{
     		        if(NDL.calleLoc <= NDL.misionesCumplidas){
                         // NDL.ubi.y = NDL.ubi.y - 1; 
-    	        	    printf("\nEsta flor ya fue entregada\n");
+    	        	    printf("\nNOTA: Esta flor ya fue entregada!\n");
                 		if (NDL.lucides[NDL.calleLoc-1] == 1){
-							printf ("(alguien la entrego por ti)\n");
+							printf ("\t(alguien la entrego por ti)\n");
                 		}
     	        	}
     		        else{
@@ -383,6 +391,9 @@ int menuDeVecino(){
 	char vecinoInput;
 	int vecinoContadorDeEscuchas = 0;
 
+	int vecinoFocusOption = 1;
+	char vecinoMensajeError[100] = "";
+
 	do{
 
 		// PRIMERA ESCENA EN VECINO, CON O SIN FLOR
@@ -392,85 +403,145 @@ int menuDeVecino(){
 			cinematica(103 + ((17*5) * NDL.misionesCumplidas));
 		}
 		
+		if (strcmp(vecinoMensajeError, "") != 0){
+			printf("%s", vecinoMensajeError);
+			strcpy(vecinoMensajeError, "");
+		} else {
+			printf("\n\n");
+		}
+		
+
 		// DIALOGO DE VECINO
 		leerEscuchar(contador);
 
-		//printf("\t\t\t\t1.Dar Flor\t2.Escuchar\t3.Salir a la calle\n");
-		printf("\t\t\t                 .n.                    /.  \\               |     |\n");
-		printf("\t\t\t                C O D                  / )  /               |  |  |\n");
-		printf("\t\t\t    1 .Dar Flor  *Y*      2 .Escuchar .)(-{      3 .Volver  |     |\n");
-		printf("\t\t\t                  |                    \\_b                  |  |  |\n");
 
-		vecinoInput = getch();
-
-		switch(vecinoInput){
-			case '1':
-				// ESTE IF NO PERMITE ENTREGAR FLOR SIN FLOR EN MANO
-				if(NDL.cantFlores < 1) {
-					printf("No llevas flores contigo ahora!!!");
-					freeze(3);
-				} else{
-					// strcpy(msj, "*Entregaste la flor*\n");
-					cinematica(103 + ((17*5) * NDL.misionesCumplidas));	//dibujo(casaDeVecino, 3);
-					freeze(1);
-					cinematica(52 + ((17*5) * NDL.misionesCumplidas));
-					freeze(1);
-					cinematica(69 + ((17*5) * NDL.misionesCumplidas));
-					freeze(1);
-					cinematica(222);	//animacion de la mano con la flor
-					freeze(2);
-					cinematica(69 + ((17*5) * NDL.misionesCumplidas));
-					freeze(1);
-					cinematica(86 + ((17*5) * NDL.misionesCumplidas));
-					freeze(2);
-					NDL.misionesCumplidas++;
-					NDL.cantFlores = 0;
-					NDL.ubi.x = 31;		//Cuando vuelve a casa desp de entregar una flor (o q la entreguen) reinicia ubicasion en la casa
-					NDL.ubi.y = 6;
-					// VOLVES A CASA
-					return 1;
-				}
+		switch (vecinoFocusOption){
+			case 1:
+				printf("\t\t\t      _          .n.  _                 /.  \\               |     |\n");
+				printf("\t\t\t     |          C O D  |               / )  /               |  |  |\n");
+				printf("\t\t\t     | Dar Flor  *Y*   |     Escuchar .)(-{         Volver  |     |\n");
+				printf("\t\t\t     |_           |   _|               \\_b                  |  |  |\n");
 				break;
 
-			case '2':
-				if(NDL.cantFlores < 1) {
-					printf("Necesitas al menos una flor para poder interactuar!\n(Puedes conseguir una en casa)");
-					freeze(3);
-				} else if(NDL.HP == 0){
-					printf("Se te acabo la energia social!!!  .  :.\n(Puedes cargarla en casa)");
-					freeze(3);
-				} else{
-					system("cls");
-					NDL.HP = NDL.HP - 25;
-					contador = contador + 1;
-					vecinoContadorDeEscuchas = vecinoContadorDeEscuchas + 1;
-
-					// ESTE IF CHECKEA SI ESCUCHASTE TODO
-					if (vecinoContadorDeEscuchas == 4){
-						NDL.lucides[NDL.misionesCumplidas] = 1;
-						NDL.misionesCumplidas = NDL.misionesCumplidas + 1;
-						NDL.cantFlores = 0;
-						NDL.ubi.x = 31;		//Cuando vuelve a casa desp de entregar una flor (o q la entreguen) reinicia ubicasion en la casa
-						NDL.ubi.y = 6;
-
-						cinematica(103 + ((17*5) * (NDL.misionesCumplidas-1)));
-						leerEscuchar(contador);
-						freeze(3);
-						// VOLVES A CASA
-						return 1;
-					}
-				}
+			case 2:
+				printf("\t\t\t                 .n.        _           /.  \\_              |     |\n");
+				printf("\t\t\t                C O D      |           / )  / |             |  |  |\n");
+				printf("\t\t\t       Dar Flor  *Y*       | Escuchar .)(-{   |     Volver  |     |\n");
+				printf("\t\t\t                  |        |_          \\_b   _|             |  |  |\n");
 				break;
-			
-			case '3':
-				NDL.ubi.y--;
-				// VOLVES A LA CALLE
-				return 2;
+
+			case 3:
+				printf("\t\t\t                 .n.                    /.  \\      _        |     | _\n");
+				printf("\t\t\t                C O D                  / )  /     |         |  |  |  |\n");
+				printf("\t\t\t       Dar Flor  *Y*         Escuchar .)(-{       | Volver  |     |  |\n");
+				printf("\t\t\t                  |                    \\_b        |_        |  |  | _|\n");
 				break;
 			
 			default:
 				break;
 		}
+
+		vecinoInput = getch();
+
+
+		switch (vecinoInput)
+		{
+		case 'a':
+		case 'A':
+			if (vecinoFocusOption > 1){
+				vecinoFocusOption--;
+			}		
+			break;
+
+		case 'd':
+		case 'D':
+			if (vecinoFocusOption < 3){
+				vecinoFocusOption++;
+			}		
+			break;
+
+		case ' ':
+		case 'w':
+		case 'W':
+			switch(vecinoFocusOption){
+				case 1:
+					// ESTE IF NO PERMITE ENTREGAR FLOR SIN FLOR EN MANO
+					if(NDL.cantFlores < 1) {
+						strcpy(vecinoMensajeError, "\n\tNo llevas flores contigo ahora!!!\n");
+						// printf("No llevas flores contigo ahora!!!");
+						// freeze(3);
+					} else{
+						cinematica(103 + ((17*5) * NDL.misionesCumplidas));
+						freeze(1);
+						cinematica(52 + ((17*5) * NDL.misionesCumplidas));
+						freeze(1);
+						cinematica(69 + ((17*5) * NDL.misionesCumplidas));
+						freeze(1);
+						if (NDL.misionesCumplidas < 3){
+							cinematica(392);	//animacion de la mano con la flor
+						} else {
+							cinematica(579);	//animacion de la mano con la flor con dedo vendado
+						}
+						freeze(1);
+						cinematica(69 + ((17*5) * NDL.misionesCumplidas));
+						freeze(1);
+						cinematica(86 + ((17*5) * NDL.misionesCumplidas));
+						freeze(2);
+						NDL.misionesCumplidas++;
+						NDL.cantFlores = 0;
+						NDL.ubi.x = 31;		//Cuando vuelve a casa desp de entregar una flor (o q la entreguen) reinicia ubicasion en la casa
+						NDL.ubi.y = 6;
+						// VOLVES A CASA
+						return 1;
+					}
+					break;
+
+				case 2:
+					if(NDL.cantFlores < 1) {
+						strcpy(vecinoMensajeError, "\n\tERROR: Necesitas al menos una flor para poder interactuar!\n\t\t(Puedes conseguir una en casa)");
+
+					} else if(NDL.HP == 0){
+						strcpy(vecinoMensajeError, "\n\tERROR: Se te acabo la energia social!  .  :.\n\t\t(Puedes cargarla en casa)");
+
+					} else{
+						system("cls");
+						NDL.HP = NDL.HP - 25;
+						contador = contador + 1;
+						vecinoContadorDeEscuchas = vecinoContadorDeEscuchas + 1;
+
+						// ESTE IF CHECKEA SI ESCUCHASTE TODO
+						if (vecinoContadorDeEscuchas == 4){
+							NDL.lucides[NDL.misionesCumplidas] = 1;
+							NDL.misionesCumplidas = NDL.misionesCumplidas + 1;
+							NDL.cantFlores = 0;
+							NDL.ubi.x = 31;		//Cuando vuelve a casa desp de entregar una flor (o q la entreguen) reinicia ubicasion en la casa
+							NDL.ubi.y = 6;
+
+							cinematica(103 + ((17*5) * (NDL.misionesCumplidas-1)));
+							printf("\n\n");
+							leerEscuchar(contador);
+							freeze(3);
+							// VOLVES A CASA
+							return 1;
+						}
+					}
+					break;
+				
+				case 3:
+					NDL.ubi.y--;
+					// VOLVES A LA CALLE
+					return 2;
+					break;
+				
+				default:
+					break;
+			}
+			break;
+
+		default:
+			break;
+		}
+
 	}while(vecinoInput >= 0);
 }
 
@@ -506,10 +577,39 @@ int dibujarEscena(char d[max][max2], int loc){
 			// AGARRASTE UNA FLOR
             if(proximo(NDL.ubi, flor) == 1 && NDL.cantFlores == 0){
 				NDL.cantFlores = 1;
+				// freeze(1);
+				if (NDL.misionesCumplidas < 3){
+					cinematica(375);
+					freeze(1);
+					cinematica(392);
+					freeze(1);
+				} else {
+					cinematica(562);
+					freeze(1);
+					cinematica(579);
+					freeze(1);
+				}
+				system("cls");
+			    printf("\n\n\n\n\n\n\n");
             }
 
 			// COMISTE LOS CARAMELOS
             if(proximo(NDL.ubi, curas) == 1 && NDL.HP < 100){
+
+				if (NDL.misionesCumplidas < 3){
+					cinematica(596);
+					freeze(1);
+					cinematica(375);
+					freeze(1);
+				} else {
+					cinematica(596);	//tengo q poner la mano con la venda aca
+					freeze(1);
+					cinematica(562);	//y aca
+					freeze(1);
+				}
+				system("cls");
+			    printf("\n\n\n\n\n\n\n");
+
 				NDL.HP = 100;
             }
 
@@ -570,6 +670,32 @@ int dibujarEscena(char d[max][max2], int loc){
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 		case 2:											//DIBUJA LA ESCENA DE LA CALLE
+
+			// 	ESTO ES PARA PASAR DE CALLE
+			// 		AVANZAR DE CALLE
+			if(NDL.ubi.x > 59){
+				NDL.calleLoc++;
+				// if(NDL.calleLoc <= NDL.misionesCumplidas + 1){		//todo lo comentado funciona, esta comentado para poder testear cosas en el mapa
+					NDL.ubi.x = 1;
+					return 4;
+				// } else {
+				// 	NDL.ubi.x = NDL.ubi.x - 2;
+				// 	NDL.calleLoc--;
+				// }
+			}
+            
+			// 		VOLVER UNA CALLE
+			if(NDL.ubi.x < 1){
+				NDL.calleLoc--;
+				// if (NDL.calleLoc >= 1){		//todo lo comentado funciona, esta comentado para poder testear cosas en el mapa
+					NDL.ubi.x = 59;
+					return 4;
+				// } else {
+				// 	NDL.ubi.x = NDL.ubi.x + 2;
+				// 	NDL.calleLoc++;
+				// }
+			}
+
 			// ESTE FOR SOLO DIBUJA LA ESCENA
             for(i = max-1; i > 0; i--){
                 printf("                              ");
@@ -605,23 +731,10 @@ int dibujarEscena(char d[max][max2], int loc){
             if((proximo(NDL.ubi, entyCoor[11]) == 2 && NDL.calleLoc==1)
 				|| (proximo(NDL.ubi, entyCoor[12]) == 2 && NDL.calleLoc==2)
 				|| (proximo(NDL.ubi, entyCoor[13]) == 2 && NDL.calleLoc==3)
+				|| (proximo(NDL.ubi, entyCoor[14]) == 2 && NDL.calleLoc==4)
 			){
                 return 3;
             }
-            
-			// 	ESTO ES PARA PASAR DE CALLE
-			// 		AVANZAR DE CALLE
-			if(NDL.ubi.x > 59){
-				NDL.calleLoc++;
-				NDL.ubi.x = 1;
-				return 4;
-			}
-			// 		VOLVER UNA CALLE
-			if(NDL.ubi.x < 1){
-				NDL.calleLoc--;
-				NDL.ubi.x = 59;
-				return 4;
-			}
 
 			printf("\e[?25l");	//ESCONDE EL "CURSOR"
             break;

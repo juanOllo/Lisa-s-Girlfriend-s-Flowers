@@ -20,8 +20,8 @@ int main() {
     // MAIN MENU
 	do{
         system("cls");
-		printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");		
-        printf("\n\nOPCIONES\n 1.JUGAR\n 2.CONFIG\n 3.SALIR");
+		printf("\n\n\n\n\n\n\n\n\n\n\n");		
+        printf("\n\n\t\t\t\t\t\tOPCIONES\n\n\t\t\t\t\t\t\t 1.JUGAR\n\t\t\t\t\t\t\t 2.CONFIG\n\t\t\t\t\t\t\t 3.SALIR");
 		printf("\e[?25l");	//ESCONDE EL "CURSOR"
 		op = getch();
 		switch(op){

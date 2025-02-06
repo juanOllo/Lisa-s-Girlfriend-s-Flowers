@@ -311,11 +311,13 @@ void cinematica(int l/*line*/){
     }
 
 	system("cls");
-    printf("\n\n\n\n\n\n\n");
+    // printf("\n\n\n\n\n\n\n");
+    printf("\n\n\n\n\n");
     
     if(f != NULL){
         for (i=1; i<=max*2-2; i++){
-			printf("                            ");
+			// printf("                            ");
+			printf("                              ");
 			fscanf(f, "%c", &aux);
             fgets(linea, sizeof(linea), f);
 			printf("%s", linea);
