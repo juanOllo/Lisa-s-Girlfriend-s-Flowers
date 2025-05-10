@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-#include <conio.h>
+//#include <conio.h>
 #include <pthread.h>
 
 #include <assert.h>
@@ -20,7 +20,7 @@ int main() {
     // MAIN MENU
 	do{
         system("cls");
-		printf("\n\n\n\n\n\n\n\n\n\n\n");		
+		printf("\n\n\n\n\n\n\n\n\n\n\n");
         printf("\n\n\t\t\t\t\t\tOPCIONES\n\n\t\t\t\t\t\t\t 1.JUGAR\n\t\t\t\t\t\t\t 2.CONFIG\n\t\t\t\t\t\t\t 3.SALIR");
 		printf("\e[?25l");	//ESCONDE EL "CURSOR"
 		op = getch();

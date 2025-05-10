@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-#include <conio.h>
+//#include <conio.h>
 #include <pthread.h>
 
 #include <assert.h>
@@ -394,20 +394,23 @@ int menuDeVecino(){
 	int vecinoFocusOption = 1;
 	char vecinoMensajeError[100] = "";
 
+	int vecino2Escuchado = 0;
+	int auxMisionesCumplidas = NDL.misionesCumplidas;
+
 	do{
 
 		// PRIMERA ESCENA EN VECINO, CON O SIN FLOR
 		if(NDL.cantFlores < 1){
-			cinematica(35 + ((17*5) * NDL.misionesCumplidas));	//dibujo(casaDeVecino, 3);	
+			cinematica(35 + ((17*5) * auxMisionesCumplidas));	//dibujo(casaDeVecino, 3);	
 		}else{
-			cinematica(103 + ((17*5) * NDL.misionesCumplidas));
+			cinematica(52 + ((17*5) * auxMisionesCumplidas));
 		}
 		
 		if (strcmp(vecinoMensajeError, "") != 0){
 			printf("%s", vecinoMensajeError);
 			strcpy(vecinoMensajeError, "");
 		} else {
-			printf("\n\n");
+			printf("\n");
 		}
 		
 
@@ -441,6 +444,26 @@ int menuDeVecino(){
 				break;
 		}
 
+		switch (NDL.HP){
+				case 100:
+					printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++++] \n");
+					break;
+				case 75:
+					printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++__] \n");
+					break;
+				case 50:
+					printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++____] \n");
+					break;
+				case 25:
+					printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++______] \n");
+					break;
+				case 0:
+					printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [________] \n");
+					break;
+				default:
+					break;
+			}
+
 		vecinoInput = getch();
 
 
@@ -467,15 +490,15 @@ int menuDeVecino(){
 				case 1:
 					// ESTE IF NO PERMITE ENTREGAR FLOR SIN FLOR EN MANO
 					if(NDL.cantFlores < 1) {
-						strcpy(vecinoMensajeError, "\n\tNo llevas flores contigo ahora!!!\n");
+						strcpy(vecinoMensajeError, "\n\tNo llevas flores contigo ahora!!!");
 						// printf("No llevas flores contigo ahora!!!");
 						// freeze(3);
 					} else{
-						cinematica(103 + ((17*5) * NDL.misionesCumplidas));
+						cinematica(52 + ((17*5) * auxMisionesCumplidas));
 						freeze(1);
-						cinematica(52 + ((17*5) * NDL.misionesCumplidas));
+						cinematica(69 + ((17*5) * auxMisionesCumplidas));
 						freeze(1);
-						cinematica(69 + ((17*5) * NDL.misionesCumplidas));
+						cinematica(86 + ((17*5) * auxMisionesCumplidas));
 						freeze(1);
 						if (NDL.misionesCumplidas < 3){
 							cinematica(392);	//animacion de la mano con la flor
@@ -483,9 +506,9 @@ int menuDeVecino(){
 							cinematica(579);	//animacion de la mano con la flor con dedo vendado
 						}
 						freeze(1);
-						cinematica(69 + ((17*5) * NDL.misionesCumplidas));
+						cinematica(86 + ((17*5) * auxMisionesCumplidas));
 						freeze(1);
-						cinematica(86 + ((17*5) * NDL.misionesCumplidas));
+						cinematica(103 + ((17*5) * auxMisionesCumplidas));
 						freeze(2);
 						NDL.misionesCumplidas++;
 						NDL.cantFlores = 0;
@@ -497,11 +520,17 @@ int menuDeVecino(){
 					break;
 
 				case 2:
+
+					if(NDL.misionesCumplidas == 1){
+						vecino2Escuchado = 1;
+						auxMisionesCumplidas = 4;
+					}
+
 					if(NDL.cantFlores < 1) {
-						strcpy(vecinoMensajeError, "\n\tERROR: Necesitas al menos una flor para poder interactuar!\n\t\t(Puedes conseguir una en casa)");
+						strcpy(vecinoMensajeError, "\n\tERROR: Necesitas al menos una flor para poder interactuar!\t(Puedes conseguir una en casa)");
 
 					} else if(NDL.HP == 0){
-						strcpy(vecinoMensajeError, "\n\tERROR: Se te acabo la energia social!  .  :.\n\t\t(Puedes cargarla en casa)");
+						strcpy(vecinoMensajeError, "\n\tERROR: Se te acabo la energia social!  .  :.\t(Puedes cargarla en casa)");
 
 					} else{
 						system("cls");
@@ -517,7 +546,7 @@ int menuDeVecino(){
 							NDL.ubi.x = 31;		//Cuando vuelve a casa desp de entregar una flor (o q la entreguen) reinicia ubicasion en la casa
 							NDL.ubi.y = 6;
 
-							cinematica(103 + ((17*5) * (NDL.misionesCumplidas-1)));
+							cinematica(52 + ((17*5) * (auxMisionesCumplidas-1)));
 							printf("\n\n");
 							leerEscuchar(contador);
 							freeze(3);

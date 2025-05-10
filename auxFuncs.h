@@ -3,7 +3,8 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-#include <conio.h>
+//#include <conio.h>
+#include "auxConio.h"
 #include <pthread.h>
 
 #include <assert.h>
@@ -23,8 +24,34 @@ typedef struct {
 
 
 
+//  ESTO ES PARA LA VERSION DE UBUNTU SI CONIO (CREO)
+////////////////////////
+// #include <unistd.h>
+// #include <fcntl.h>
+// #include <termios.h>
 
+// int setEchoMode(bool enable)
+//     {
+//         struct termios oldt, newt;
+//         int ch;
+//         tcgetattr(STDIN_FILENO, &oldt);
+//         newt = oldt;
+//         newt.c_lflag &= ~ICANON;
+//         if (enable)
+//             newt.c_lflag |= ECHO;
+//         else
+//             newt.c_lflag &= ~ECHO;
+//         tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+//         ch = getchar();
+//         tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+//         return ch;
+//     }
 
+//     int getch()
+//     {
+//         return setEchoMode(false);
+//     }
+////////////////////////
 
 
 
@@ -442,3 +469,4 @@ void cinematica(int l/*line*/){
 
 // 	fclose(f);
 // }
+
