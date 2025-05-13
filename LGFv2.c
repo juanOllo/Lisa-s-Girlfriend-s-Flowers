@@ -17,12 +17,29 @@ int main() {
 
     char op;
 
+
+
+	// FILE *save;
+	// save = fopen("save.txt", "w");
+	// fprintf(save, "1000000025");
+	// fclose(save);
+
+
+
     // MAIN MENU
 	do{
-        system("cls");
-		printf("\n\n\n\n\n\n\n\n\n\n\n");
-        printf("\n\n\t\t\t\t\t\tOPCIONES\n\n\t\t\t\t\t\t\t 1.JUGAR\n\t\t\t\t\t\t\t 2.CONFIG\n\t\t\t\t\t\t\t 3.SALIR");
+        // system("cls");
+		cls();
+		printf("\n\n\n\n\n");
+        printf("\n\n\t\t\t\t\t\tOPCIONES\n\n\t\t\t\t\t\t\t 1.JUGAR\n\t\t\t\t\t\t\t 2.CONFIG\n\t\t\t\t\t\t\t 3.SALIR\n\n\n\n\n\n");
 		printf("\e[?25l");	//ESCONDE EL "CURSOR"
+		// printf("\ntu ch es: %c", op);
+		printf("\n\n\n                                                                                                                        ");
+		printf("\n                                                     CONTROLES                                                          ");
+		printf("\n                                                                                                                        ");
+		printf("\n                                  MOVIMIENTO:                        SELECCIONAR:                                       ");
+		printf("\n                               W                                                                                        ");
+		printf("\n                            A  S  D    /    FLECHAS                BARRA ESPACIADORA                                    ");
 		op = getch();
 		switch(op){
 			case '1':
@@ -36,6 +53,7 @@ int main() {
 
 			case '3':
 				// CERRAR EL JUEGO
+				cls();
                 return 0;
 
 			default:

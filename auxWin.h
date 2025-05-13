@@ -308,3 +308,7 @@ extern "C" {
 #include <sec_api/conio_s.h>
 
 #endif
+
+void cls() {
+  system("cls");
+}

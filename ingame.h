@@ -15,15 +15,15 @@
 
 coor entyCoor[20];
 
-struct NoviaDeLisa {
-	int HP; // NDL.HP
-	int cantFlores;
-	int misionesCumplidas;
-	int primeraVez;
-	int lucides[4];
-	coor ubi;
-	int calleLoc;
-};
+// struct NoviaDeLisa {
+// 	int HP; // NDL.HP
+// 	int cantFlores;
+// 	int misionesCumplidas;
+// 	int primeraVez;
+// 	int lucides[4];
+// 	coor ubi;
+// 	int calleLoc;
+// };
 struct NoviaDeLisa NDL;
 // int actualLocation = 1;
 
@@ -42,6 +42,11 @@ int menuDeCalle();
 int menuDeVecino();
 
 int dibujarEscena(char d[max][max2], int loc);
+
+//lo uso para cargar la data guardada en el pj
+//	deberia estar en el main pero para eso tengo q arreglar el tema de los punteros
+char saveArray[11];
+
 
 
 
@@ -87,16 +92,47 @@ void playGame() {
     /**/ curas.y = 4;
 	////////////////////////////////////////////////////////////////
 
-	/////////////////INICIALISACION DE PESONAJE/////////////////////
-	/**/ NDL.HP = 100;
-	/**/ NDL.cantFlores = 0; //0
-	/**/ NDL.misionesCumplidas = 0;
-	/**/ NDL.primeraVez = 0;
-	/**/ for(int ini = 0; ini<=3; ini++){
-	/**/ 	NDL.lucides[ini] = 0;
-	/**/ }
-	/**/ NDL.calleLoc = 1;	//nuevo actual location
-	////////////////////////////////////////////////////////////////
+
+	//	SI EXISTE EL ARCHIVO save.txt ENTONCES CARGA LOS DATOS EN EL PERSONAJE
+	//		SINO INICIALIZA EL PERSONAJE DESDE 0
+	if (access("save.txt", F_OK) == 0) {
+
+		FILE *saveFile = fopen("save.txt", "r");
+
+		if (saveFile!=NULL){
+		fgets(saveArray, sizeof(saveArray), saveFile);
+
+		/////////////////CARGA DE PESONAJE GUARDADO/////////////////////
+		/**/ NDL.HP = atoi(&saveArray[7]);
+			char cAux = saveArray[0];
+		/**/ NDL.cantFlores = atoi(&cAux); //0
+			cAux = saveArray[1];
+		/**/ NDL.misionesCumplidas = atoi(&cAux);
+			cAux = saveArray[2];
+		/**/ NDL.primeraVez = atoi(&cAux);
+		/**/ for(int ini = 0; ini<=3; ini++){
+				cAux = saveArray[3 + ini];
+		/**/ 	NDL.lucides[ini] = atoi(&cAux);
+		/**/ }
+		/**/ NDL.calleLoc = 1;	//nuevo actual location
+		////////////////////////////////////////////////////////////////
+
+		}
+	} else {
+		
+		/////////////////INICIALISACION DE PESONAJE/////////////////////
+		/**/ NDL.HP = 100;
+		/**/ NDL.cantFlores = 0; //0
+		/**/ NDL.misionesCumplidas = 0;
+		/**/ NDL.primeraVez = 0;
+		/**/ for(int ini = 0; ini<=3; ini++){
+		/**/ 	NDL.lucides[ini] = 0;
+		/**/ }
+		/**/ NDL.calleLoc = 1;	//nuevo actual location
+		////////////////////////////////////////////////////////////////
+		
+		guardarPartida(&NDL);
+	}
 
 	/////////////////INICIALISACION DE ENTIDADES/////////////////////
 	/**/ entyCoor[1].x= 30;			//abeja 1
@@ -126,6 +162,7 @@ void playGame() {
 		switch(op){
 			case 1: {
 				// menuDeCasa
+				guardarPartida(&NDL);
 				op = menuDeCasa();
 				break;
 			};
@@ -203,14 +240,19 @@ int menuDeCasa(){
     
     //system ("/bin/stty raw"); //FUNCIONA PARA Q GETCHAR() FUNCIONE EN UBUNTU
     
-    while(casaInput != 'p' && casaInput != 'P'){
-        system("cls");
+    while(casaInput != '.'){
+        cls();
         // printf("Ubicacion: %d %d \n", NDL.ubi.x, NDL.ubi.y); //Ubicasion de la novia d lisa
         //printf("Ubicacion enemi: %d %d \n", eubi.x, eubi.y); //ubicasion de las abejas
 
 		//	DEVUELVE 1 SI SALISTE A LA CALLE
 		//	SINO DEVUELVE 0
         estadoEnCasa = dibujarEscena(escCasa, 1);
+		// printf("\nmi save: %s", saveArray);
+		// printf("\nmi save en 0: %c", saveArray[0]);
+		// printf("\nmi save en 1: %c", saveArray[1]);
+		// printf("\nmi save en 2: %c", saveArray[2]);
+		// guardarPartida(&NDL);
         
         switch(estadoEnCasa){
             case 0:
@@ -219,6 +261,9 @@ int menuDeCasa(){
 
 			// SALIO A LA CALLE POR LA PUERTA
             case 1:
+
+				guardarPartida(&NDL);
+
 				// ESTE IF NO TE DEJA SALIR DE CASA CON 0 DE ENERGIA
 				if(NDL.HP == 0) {
 					NDL.ubi.x = NDL.ubi.x - 6;
@@ -300,9 +345,9 @@ int menuDeCalle (){
 	char calleInput;
 
 	do{
-		system("cls");
+		cls();
 		estadoEnCalle = dibujarEscena(escCalle, 2);
-        // printf("Ubicacion: %d %d \n", NDL.ubi.x, NDL.ubi.y); //Ubicasion de la novia d lisa
+        printf("Ubicacion: %d %d \n", NDL.ubi.x, NDL.ubi.y); //Ubicasion de la novia d lisa
 
 		// printf("\nEstadoEnCalle: %d\n", estadoEnCalle);
         
@@ -338,7 +383,7 @@ int menuDeCalle (){
 		    case 3:
 				// ENTRAR A UN VECINO
 		        if(NDL.calleLoc-1 > NDL.misionesCumplidas){
-		            //system("cls");
+		            //cls();
 		            printf("\nAVISO: Debes entregas la flor anterior.\n");
 		        }
 		        else{
@@ -471,6 +516,7 @@ int menuDeVecino(){
 		{
 		case 'a':
 		case 'A':
+		case 'K':
 			if (vecinoFocusOption > 1){
 				vecinoFocusOption--;
 			}		
@@ -478,14 +524,13 @@ int menuDeVecino(){
 
 		case 'd':
 		case 'D':
+		case 'M':
 			if (vecinoFocusOption < 3){
 				vecinoFocusOption++;
 			}		
 			break;
 
 		case ' ':
-		case 'w':
-		case 'W':
 			switch(vecinoFocusOption){
 				case 1:
 					// ESTE IF NO PERMITE ENTREGAR FLOR SIN FLOR EN MANO
@@ -501,7 +546,7 @@ int menuDeVecino(){
 						cinematica(86 + ((17*5) * auxMisionesCumplidas));
 						freeze(1);
 						if (NDL.misionesCumplidas < 3){
-							cinematica(392);	//animacion de la mano con la flor
+							cinematica(511);	//animacion de la mano con la flor
 						} else {
 							cinematica(579);	//animacion de la mano con la flor con dedo vendado
 						}
@@ -533,7 +578,7 @@ int menuDeVecino(){
 						strcpy(vecinoMensajeError, "\n\tERROR: Se te acabo la energia social!  .  :.\t(Puedes cargarla en casa)");
 
 					} else{
-						system("cls");
+						cls();
 						NDL.HP = NDL.HP - 25;
 						contador = contador + 1;
 						vecinoContadorDeEscuchas = vecinoContadorDeEscuchas + 1;
@@ -571,7 +616,7 @@ int menuDeVecino(){
 			break;
 		}
 
-	}while(vecinoInput >= 0);
+	}while(vecinoInput != '.');
 }
 
 
@@ -596,8 +641,9 @@ int dibujarEscena(char d[max][max2], int loc){
     int j, i;
 	int rAux;
 
-    system("cls");
-    printf("\n\n\n\n\n\n\n");
+    cls();
+    // printf("\n\n\n\n\n\n\n");
+    printf("\n\n\n\n\n");
     switch(loc){
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
         case 1:											//DIBUJA LA ESCENA DE LA CASA
@@ -608,9 +654,9 @@ int dibujarEscena(char d[max][max2], int loc){
 				NDL.cantFlores = 1;
 				// freeze(1);
 				if (NDL.misionesCumplidas < 3){
-					cinematica(375);
+					cinematica(494);
 					freeze(1);
-					cinematica(392);
+					cinematica(511);
 					freeze(1);
 				} else {
 					cinematica(562);
@@ -618,8 +664,9 @@ int dibujarEscena(char d[max][max2], int loc){
 					cinematica(579);
 					freeze(1);
 				}
-				system("cls");
-			    printf("\n\n\n\n\n\n\n");
+				cls();
+			    // printf("\n\n\n\n\n\n\n");
+			    printf("\n\n\n\n\n");
             }
 
 			// COMISTE LOS CARAMELOS
@@ -636,8 +683,9 @@ int dibujarEscena(char d[max][max2], int loc){
 					cinematica(562);	//y aca
 					freeze(1);
 				}
-				system("cls");
-			    printf("\n\n\n\n\n\n\n");
+				cls();
+			    // printf("\n\n\n\n\n\n\n");
+			    printf("\n\n\n\n\n");
 
 				NDL.HP = 100;
             }

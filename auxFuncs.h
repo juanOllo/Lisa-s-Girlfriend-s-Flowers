@@ -4,7 +4,8 @@
 #include <math.h>
 #include <time.h>
 //#include <conio.h>
-#include "auxConio.h"
+#include "auxWin.h"
+//#include "auxUbu.h"
 #include <pthread.h>
 
 #include <assert.h>
@@ -20,38 +21,23 @@ typedef struct {
 	int y;
 } coor;
 
+struct NoviaDeLisa {
+	int HP; // NDL.HP
+	int cantFlores;
+	int misionesCumplidas;
+	int primeraVez;
+	int lucides[4];
+	coor ubi;
+	int calleLoc;
+};
+
 // int proximo(coor u, coor e);
 
 
 
-//  ESTO ES PARA LA VERSION DE UBUNTU SI CONIO (CREO)
-////////////////////////
-// #include <unistd.h>
-// #include <fcntl.h>
-// #include <termios.h>
 
-// int setEchoMode(bool enable)
-//     {
-//         struct termios oldt, newt;
-//         int ch;
-//         tcgetattr(STDIN_FILENO, &oldt);
-//         newt = oldt;
-//         newt.c_lflag &= ~ICANON;
-//         if (enable)
-//             newt.c_lflag |= ECHO;
-//         else
-//             newt.c_lflag &= ~ECHO;
-//         tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-//         ch = getchar();
-//         tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-//         return ch;
-//     }
 
-//     int getch()
-//     {
-//         return setEchoMode(false);
-//     }
-////////////////////////
+
 
 
 
@@ -243,18 +229,22 @@ coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], in
             switch (input){
                 case 'd':
                 case 'D':
+                case 'M':
                     movimientoAux.x = movimientoAux.x + 3;
                     break;
                 case 'a':
                 case 'A':
+                case 'K':
                     movimientoAux.x = movimientoAux.x - 3;
                     break;
                 case 'w':
                 case 'W':
+                case 'H':
                     movimientoAux.y = movimientoAux.y + 1;
                     break;
                 case 's':
                 case 'S':
+                case 'P':
                     movimientoAux.y = movimientoAux.y - 1;
                     break;
                 default:
@@ -268,18 +258,22 @@ coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], in
             switch (input){
                 case 'd':
                 case 'D':
+                case 'M':
                     movimientoAux.x = movimientoAux.x + 2;
                     break;
                 case 'a':
                 case 'A':
+                case 'K':
                     movimientoAux.x = movimientoAux.x - 2;
                     break;
                 case 'w':
                 case 'W':
+                case 'H':
                     movimientoAux.y = movimientoAux.y + 1;
                     break;
                 case 's':
                 case 'S':
+                case 'P':
                     movimientoAux.y = movimientoAux.y - 1;
                     break;
                 default:
@@ -292,14 +286,14 @@ coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], in
     }
 
 
-    if(movimientoLimit[max - movimientoAux.y][movimientoAux.x] == '#' 
-        // ||
-        // movimientoAux.y<0
-    ) {
-        return actualUbi;
-    } else {
+    // if(movimientoLimit[max - movimientoAux.y][movimientoAux.x] == '#' 
+    //     // ||
+    //     // movimientoAux.y<0
+    // ) {
+    //     return actualUbi;
+    // } else {
         return movimientoAux;
-    }
+    // }
 }
 
 
@@ -337,7 +331,7 @@ void cinematica(int l/*line*/){
         inicio++;
     }
 
-	system("cls");
+	cls();
     // printf("\n\n\n\n\n\n\n");
     printf("\n\n\n\n\n");
     
@@ -375,7 +369,7 @@ void cinematica(int l/*line*/){
 //         inicio++;
 //     }
 
-// 	system("cls");
+// 	cls();
 //     printf("\n\n\n\n\n\n\n");
     
 //     if(f != NULL){
@@ -428,7 +422,7 @@ void cinematica(int l/*line*/){
 //         inicio++;
 //     }
 
-// 	system("cls");
+// 	cls();
 //     printf("\n\n\n\n\n\n\n");
     
 //     if(f != NULL){
@@ -470,3 +464,60 @@ void cinematica(int l/*line*/){
 // 	fclose(f);
 // }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void guardarPartida(struct NoviaDeLisa *ndl){
+
+    char toSaveArray[11];
+
+    sprintf(&toSaveArray[0], "%d", ndl->cantFlores);
+    sprintf(&toSaveArray[1], "%d", ndl->misionesCumplidas);
+    sprintf(&toSaveArray[2], "%d", ndl->primeraVez);
+    sprintf(&toSaveArray[3], "%d", ndl->lucides[0]);
+    sprintf(&toSaveArray[4], "%d", ndl->lucides[1]);
+    sprintf(&toSaveArray[5], "%d", ndl->lucides[2]);
+    sprintf(&toSaveArray[6], "%d", ndl->lucides[3]);
+
+    switch (ndl->HP)
+    {
+    case 100:
+        sprintf(&toSaveArray[7], "%d", ndl->HP);
+        break;
+    
+    case 25:
+    case 50:
+    case 75:
+    printf("\nENTRO");
+        sprintf(&toSaveArray[7], "%d", 0);
+        sprintf(&toSaveArray[8], "%d", ndl->HP);
+        break;
+
+    case 0:
+        sprintf(&toSaveArray[7], "%d", 0);
+        sprintf(&toSaveArray[8], "%d", 0);
+        sprintf(&toSaveArray[9], "%d", ndl->HP);
+        break;
+    
+    default:
+        break;
+    }
+
+    FILE *save;
+	save = fopen("save.txt", "w");
+	fprintf(save, toSaveArray);
+	fclose(save);
+}
