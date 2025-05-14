@@ -38,6 +38,24 @@ struct NoviaDeLisa {
 
 
 
+void matrisDebug(char matris[max][max2]){
+
+    FILE *errors;
+	errors = fopen("errors.txt", "a");
+
+    char *matrisFila[max2];
+
+    for(int i = 0; i<20; i++){
+
+        // matrisFila = &matris[0][i];
+        matrisFila[0] = &matris[i][0];
+
+        fprintf(errors, matrisFila[0]);
+        fprintf(errors, "\n");
+    }
+
+	fclose(errors);
+}
 
 
 
@@ -79,6 +97,9 @@ void cargaDeEscena(char d[max][max2], int l){
             d[0][j] = '#';
             j++;
 		}
+
+        //lo usaba para solucionar lo de las esquinas de las escenas de la calle, ponele
+        // d[max][1] = 'j';
 		
     }
     else{
@@ -86,6 +107,8 @@ void cargaDeEscena(char d[max][max2], int l){
     }
 
 	fclose(f);
+
+    // matrisDebug(d);
 }
 
 
@@ -216,6 +239,28 @@ void leerEscuchar(int cont){
 
 
 
+
+
+void error(char errorMsj[100]){
+    FILE *errors;
+	errors = fopen("errors.txt", "a");
+	fprintf(errors, errorMsj);
+	fprintf(errors, "\n");
+	fclose(errors);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 // FUNCION QUE DEVUELVE NUEVA UBI DE NDL CUANDO TE MOVES RESPETANDO LIMITES
 //                 ubi actual    input del                                      casa = 0
 //                 de NDL        teclado        escLimitCalle/Casa              calle = 1
@@ -286,14 +331,15 @@ coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], in
     }
 
 
-    // if(movimientoLimit[max - movimientoAux.y][movimientoAux.x] == '#' 
-    //     // ||
-    //     // movimientoAux.y<0
-    // ) {
-    //     return actualUbi;
-    // } else {
+    if(movimientoLimit[max - movimientoAux.y][movimientoAux.x] == '#' 
+        // ||
+        // movimientoAux.y<0
+    ) {
+        error("ubo un error");
+        return actualUbi;
+    } else {
         return movimientoAux;
-    // }
+    }
 }
 
 
@@ -501,7 +547,6 @@ void guardarPartida(struct NoviaDeLisa *ndl){
     case 25:
     case 50:
     case 75:
-    printf("\nENTRO");
         sprintf(&toSaveArray[7], "%d", 0);
         sprintf(&toSaveArray[8], "%d", ndl->HP);
         break;

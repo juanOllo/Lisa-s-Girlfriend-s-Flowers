@@ -20,7 +20,9 @@ int main() {
 
 
 	// FILE *save;
-	// save = fopen("save.txt", "w");
+	// save = fopen("save.txt", "r");
+	// fclose(save);
+
 	// fprintf(save, "1000000025");
 	// fclose(save);
 
@@ -30,8 +32,16 @@ int main() {
 	do{
         // system("cls");
 		cls();
+		printf("-----------------------------------------------------------------------------------------------------------------------+");
 		printf("\n\n\n\n\n");
-        printf("\n\n\t\t\t\t\t\tOPCIONES\n\n\t\t\t\t\t\t\t 1.JUGAR\n\t\t\t\t\t\t\t 2.CONFIG\n\t\t\t\t\t\t\t 3.SALIR\n\n\n\n\n\n");
+		if (access("save.txt", F_OK) == 0) {
+	        printf("\n\n\t\t\t\t\t\tOPCIONES\n\n\t\t\t\t\t\t\t 1.CONTINUAR\n\t\t\t\t\t\t\t 2.CONFIG\n\t\t\t\t\t\t\t 3.SALIR\n\t\t\t\t\t\t\t 4.BORRAR PARTIDA\n\n\n\n\n");
+		} else {
+			printf("\n\n\t\t\t\t\t\tOPCIONES\n\n\t\t\t\t\t\t\t 1.JUGAR\n\t\t\t\t\t\t\t 2.CONFIG\n\t\t\t\t\t\t\t 3.SALIR\n\n\n\n\n\n");
+		}
+
+
+
 		printf("\e[?25l");	//ESCONDE EL "CURSOR"
 		// printf("\ntu ch es: %c", op);
 		printf("\n\n\n                                                                                                                        ");
@@ -40,6 +50,9 @@ int main() {
 		printf("\n                                  MOVIMIENTO:                        SELECCIONAR:                                       ");
 		printf("\n                               W                                                                                        ");
 		printf("\n                            A  S  D    /    FLECHAS                BARRA ESPACIADORA                                    ");
+
+		// printf("\n\n\n\n                                                                                                                       A");
+		printf("\n\n\n\n-----------------------------------------------------------------------------------------------------------------------+");
 		op = getch();
 		switch(op){
 			case '1':
@@ -49,12 +62,22 @@ int main() {
 				
 			case '2':
 				// ABRIR CONFIG.
+				cls();
 				break;
 
 			case '3':
 				// CERRAR EL JUEGO
 				cls();
                 return 0;
+
+			case '4':
+				// BORRAR PARTIDA GUARDADA
+				cls();
+				if (access("save.txt", F_OK) == 0) {
+					remove("save.txt");
+				}
+
+				break;
 
 			default:
 				// INGRESA UN VALOR ENTRE 1 Y 3

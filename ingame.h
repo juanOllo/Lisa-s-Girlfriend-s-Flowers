@@ -99,23 +99,24 @@ void playGame() {
 
 		FILE *saveFile = fopen("save.txt", "r");
 
+		//este if capaz es innecesario
 		if (saveFile!=NULL){
-		fgets(saveArray, sizeof(saveArray), saveFile);
+			fgets(saveArray, sizeof(saveArray), saveFile);
 
-		/////////////////CARGA DE PESONAJE GUARDADO/////////////////////
-		/**/ NDL.HP = atoi(&saveArray[7]);
-			char cAux = saveArray[0];
-		/**/ NDL.cantFlores = atoi(&cAux); //0
-			cAux = saveArray[1];
-		/**/ NDL.misionesCumplidas = atoi(&cAux);
-			cAux = saveArray[2];
-		/**/ NDL.primeraVez = atoi(&cAux);
-		/**/ for(int ini = 0; ini<=3; ini++){
-				cAux = saveArray[3 + ini];
-		/**/ 	NDL.lucides[ini] = atoi(&cAux);
-		/**/ }
-		/**/ NDL.calleLoc = 1;	//nuevo actual location
-		////////////////////////////////////////////////////////////////
+			/////////////////CARGA DE PESONAJE GUARDADO/////////////////////
+			/**/ NDL.HP = atoi(&saveArray[7]);
+				char cAux = saveArray[0];
+			/**/ NDL.cantFlores = atoi(&cAux); //0
+				cAux = saveArray[1];
+			/**/ NDL.misionesCumplidas = atoi(&cAux);
+				cAux = saveArray[2];
+			/**/ NDL.primeraVez = atoi(&cAux);
+			/**/ for(int ini = 0; ini<=3; ini++){
+					cAux = saveArray[3 + ini];
+			/**/ 	NDL.lucides[ini] = atoi(&cAux);
+			/**/ }
+			/**/ NDL.calleLoc = 1;	//nuevo actual location
+			////////////////////////////////////////////////////////////////
 
 		}
 	} else {
@@ -347,7 +348,7 @@ int menuDeCalle (){
 	do{
 		cls();
 		estadoEnCalle = dibujarEscena(escCalle, 2);
-        printf("Ubicacion: %d %d \n", NDL.ubi.x, NDL.ubi.y); //Ubicasion de la novia d lisa
+        // printf("Ubicacion: %d %d \n", NDL.ubi.x, NDL.ubi.y); //Ubicasion de la novia d lisa
 
 		// printf("\nEstadoEnCalle: %d\n", estadoEnCalle);
         
@@ -574,8 +575,8 @@ int menuDeVecino(){
 					if(NDL.cantFlores < 1) {
 						strcpy(vecinoMensajeError, "\n\tERROR: Necesitas al menos una flor para poder interactuar!\t(Puedes conseguir una en casa)");
 
-					} else if(NDL.HP == 0){
-						strcpy(vecinoMensajeError, "\n\tERROR: Se te acabo la energia social!  .  :.\t(Puedes cargarla en casa)");
+					// } else if(NDL.HP == 25){
+						// strcpy(vecinoMensajeError, "\n\tERROR: Se te acabo la energia social!  .  :.\t(Puedes cargarla en casa)");
 
 					} else{
 						cls();
@@ -583,18 +584,27 @@ int menuDeVecino(){
 						contador = contador + 1;
 						vecinoContadorDeEscuchas = vecinoContadorDeEscuchas + 1;
 
-						// ESTE IF CHECKEA SI ESCUCHASTE TODO
-						if (vecinoContadorDeEscuchas == 4){
-							NDL.lucides[NDL.misionesCumplidas] = 1;
+						if (NDL.HP == 0){
+
+							// ESTE IF CHECKEA SI ESCUCHASTE TODO
+							if (vecinoContadorDeEscuchas == 4){
+								NDL.lucides[NDL.misionesCumplidas] = 1;
+
+								cinematica(52 + ((17*5) * (auxMisionesCumplidas-1)));
+								printf("\n\n");
+								leerEscuchar(contador);
+								freeze(3);
+							
+							}
+
 							NDL.misionesCumplidas = NDL.misionesCumplidas + 1;
 							NDL.cantFlores = 0;
 							NDL.ubi.x = 31;		//Cuando vuelve a casa desp de entregar una flor (o q la entreguen) reinicia ubicasion en la casa
 							NDL.ubi.y = 6;
 
-							cinematica(52 + ((17*5) * (auxMisionesCumplidas-1)));
-							printf("\n\n");
-							leerEscuchar(contador);
-							freeze(3);
+							// deberia agregar una cinematica cuando te quedas sin energia 
+							//		con un vecino pero no llegaste a las 4 escuchas
+
 							// VOLVES A CASA
 							return 1;
 						}
