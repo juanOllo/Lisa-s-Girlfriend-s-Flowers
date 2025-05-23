@@ -378,8 +378,8 @@ void cinematica(int l/*line*/){
     }
 
 	cls();
-    // printf("\n\n\n\n\n\n\n");
-    printf("\n\n\n\n\n");
+    printf("\n\n\n\n\n\n\n");
+    // printf("\n\n\n\n\n");
     
     if(f != NULL){
         for (i=1; i<=max*2-2; i++){
@@ -528,7 +528,7 @@ void cinematica(int l/*line*/){
 
 void guardarPartida(struct NoviaDeLisa *ndl){
 
-    char toSaveArray[11];
+    char toSaveArray[16];
 
     sprintf(&toSaveArray[0], "%d", ndl->cantFlores);
     sprintf(&toSaveArray[1], "%d", ndl->misionesCumplidas);
@@ -560,6 +560,23 @@ void guardarPartida(struct NoviaDeLisa *ndl){
     default:
         break;
     }
+
+    if(ndl->ubi.x > 9){
+        sprintf(&toSaveArray[10], "%d", ndl->ubi.x);
+    } else {
+        sprintf(&toSaveArray[10], "%d", 0);
+        sprintf(&toSaveArray[11], "%d", ndl->ubi.x);
+    }
+    
+    if(ndl->ubi.y > 9){
+        sprintf(&toSaveArray[12], "%d", ndl->ubi.y);
+    } else {
+        sprintf(&toSaveArray[12], "%d", 0);
+        sprintf(&toSaveArray[13], "%d", ndl->ubi.y);
+    }
+
+    sprintf(&toSaveArray[14], "%d", ndl->calleLoc);
+
 
     FILE *save;
 	save = fopen("save.txt", "w");

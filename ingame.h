@@ -1,14 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <time.h>
-//#include <conio.h>
-#include <pthread.h>
-
-#include <assert.h>
-#include <unistd.h>
-
 #include "auxFuncs.h"
 #define max 16
 #define max2 60
@@ -45,7 +34,7 @@ int dibujarEscena(char d[max][max2], int loc);
 
 //lo uso para cargar la data guardada en el pj
 //	deberia estar en el main pero para eso tengo q arreglar el tema de los punteros
-char saveArray[11];
+char saveArray[16];
 
 
 
@@ -79,8 +68,8 @@ void playGame() {
 	
 	//////////////////INICIALISACION DE UBICACIONES////////////////// 
 	/*		LOCS DENTRO DE LA CASA		*/
-	/**/ NDL.ubi.x = 31;		//NDL por primera vez en el juego
-    /**/ NDL.ubi.y = 6;
+	// /**/ NDL.ubi.x = 31;		//NDL por primera vez en el juego
+    // /**/ NDL.ubi.y = 6;
 	/**/
     /**/ flor.x = 46;			//FLOR
     /**/ flor.y = 10;
@@ -104,20 +93,25 @@ void playGame() {
 			fgets(saveArray, sizeof(saveArray), saveFile);
 
 			/////////////////CARGA DE PESONAJE GUARDADO/////////////////////
-			/**/ NDL.HP = atoi(&saveArray[7]);
-				char cAux = saveArray[0];
+			/**/ NDL.HP = atoi(&saveArray[7]) / 100000;
+			/**/ char cAux = saveArray[0];
 			/**/ NDL.cantFlores = atoi(&cAux); //0
-				cAux = saveArray[1];
+			/**/ cAux = saveArray[1];
 			/**/ NDL.misionesCumplidas = atoi(&cAux);
-				cAux = saveArray[2];
+			/**/ cAux = saveArray[2];
 			/**/ NDL.primeraVez = atoi(&cAux);
 			/**/ for(int ini = 0; ini<=3; ini++){
-					cAux = saveArray[3 + ini];
+			/**/	cAux = saveArray[3 + ini];
 			/**/ 	NDL.lucides[ini] = atoi(&cAux);
 			/**/ }
-			/**/ NDL.calleLoc = 1;	//nuevo actual location
+
+			/**/ NDL.ubi.x = atoi(&saveArray[10]) / 1000;		//NDL por primera vez en el juego
+    		/**/ NDL.ubi.y = atoi(&saveArray[12]) / 10;	
+
+			/**/ NDL.calleLoc = atoi(&saveArray[14]);	//nuevo actual location
 			////////////////////////////////////////////////////////////////
 
+			fclose(saveFile);
 		}
 	} else {
 		
@@ -129,7 +123,11 @@ void playGame() {
 		/**/ for(int ini = 0; ini<=3; ini++){
 		/**/ 	NDL.lucides[ini] = 0;
 		/**/ }
-		/**/ NDL.calleLoc = 1;	//nuevo actual location
+
+		/**/ NDL.ubi.x = 31;		//NDL por primera vez en el juego
+		/**/ NDL.ubi.y = 6;	
+
+		/**/ NDL.calleLoc = 0;	//nuevo actual location
 		////////////////////////////////////////////////////////////////
 		
 		guardarPartida(&NDL);
@@ -156,7 +154,18 @@ void playGame() {
 
 
 	// PRIMERO LLAMA AL MENU DE CASA
-	int op = menuDeCasa();
+	// int op = menuDeCasa();
+	int op;
+
+	switch (NDL.calleLoc){
+		case 0:
+			op = 1;
+			break;
+		
+		default:
+			op = 2;
+			break;
+	}
 
 	do{
 		// CADA MENU DEVUELVE UN NRO QUE INDICA A Q NUEVA ESCENA/MENU VA EL PERSONAJE
@@ -242,7 +251,7 @@ int menuDeCasa(){
     //system ("/bin/stty raw"); //FUNCIONA PARA Q GETCHAR() FUNCIONE EN UBUNTU
     
     while(casaInput != '.'){
-        cls();
+        // cls();
         // printf("Ubicacion: %d %d \n", NDL.ubi.x, NDL.ubi.y); //Ubicasion de la novia d lisa
         //printf("Ubicacion enemi: %d %d \n", eubi.x, eubi.y); //ubicasion de las abejas
 
@@ -286,6 +295,7 @@ int menuDeCasa(){
 		// MOVIMIENTO DE NDL
 		NDL.ubi = movimiento(casaInput, NDL.ubi, escCasaLimit, 0);
     }
+	guardarPartida(&NDL);
 }
 
 
@@ -342,11 +352,25 @@ int menuDeCalle (){
 	/**/ entyCoor[3].y= 4;
 
 	//system ("cls");
-	int estadoEnCalle;
+	int estadoEnCalle = dibujarEscena(escCalle, 2);
 	char calleInput;
 
+	//estos printfs borran el hud del menu principal cuando volves a la calle
+	// 	siento q estos prints podrian romper algo en algun futuro
+	printf("                                                                                                                       ");
+	printf("\n                                                                                                                       ");
+	printf("\n                                                                                                                       ");
+	printf("\n                                                                                                                       ");
+	printf("\n                                                                                                                       ");
+	printf("\n                                                                                                                       ");
+	printf("\n                                                                                                                       ");
+	printf("\n                                                                                                                       ");
+	printf("\n                                                                                                                       ");
+	printf("\n                                                                                                                        ");
+
+
 	do{
-		cls();
+		// cls();
 		estadoEnCalle = dibujarEscena(escCalle, 2);
         // printf("Ubicacion: %d %d \n", NDL.ubi.x, NDL.ubi.y); //Ubicasion de la novia d lisa
 
@@ -368,6 +392,7 @@ int menuDeCalle (){
 				// ENTRAR A CASA POR PUERTA
 				NDL.ubi.x = 52;
     			NDL.ubi.y = 6;
+				NDL.calleLoc = 0;
 				return 1;
 				break;
 		    case 2:
@@ -414,7 +439,8 @@ int menuDeCalle (){
 		// MOVIMIENTO DE NDL
 		NDL.ubi = movimiento(calleInput, NDL.ubi, escCalleLimit, 1);
 		
-	}while(estadoEnCalle != 6);
+	}while(estadoEnCalle != 6 && calleInput != '.');
+	guardarPartida(&NDL);
 }
 
 
@@ -443,14 +469,16 @@ int menuDeVecino(){
 	int vecino2Escuchado = 0;
 	int auxMisionesCumplidas = NDL.misionesCumplidas;
 
+	// PRIMERA ESCENA EN VECINO, CON O SIN FLOR
+	if(NDL.cantFlores < 1){
+		cinematica(35 + ((17*5) * auxMisionesCumplidas));	//dibujo(casaDeVecino, 3);	
+	}else{
+		cinematica(52 + ((17*5) * auxMisionesCumplidas));
+	}
+
 	do{
 
-		// PRIMERA ESCENA EN VECINO, CON O SIN FLOR
-		if(NDL.cantFlores < 1){
-			cinematica(35 + ((17*5) * auxMisionesCumplidas));	//dibujo(casaDeVecino, 3);	
-		}else{
-			cinematica(52 + ((17*5) * auxMisionesCumplidas));
-		}
+		printf("\e[%iA", 5);
 		
 		if (strcmp(vecinoMensajeError, "") != 0){
 			printf("%s", vecinoMensajeError);
@@ -466,24 +494,27 @@ int menuDeVecino(){
 
 		switch (vecinoFocusOption){
 			case 1:
-				printf("\t\t\t      _          .n.  _                 /.  \\               |     |\n");
-				printf("\t\t\t     |          C O D  |               / )  /               |  |  |\n");
-				printf("\t\t\t     | Dar Flor  *Y*   |     Escuchar .)(-{         Volver  |     |\n");
-				printf("\t\t\t     |_           |   _|               \\_b                  |  |  |\n");
+				printf("\n");
+				printf("\t\t\t      _          .n.  _                 /.  \\               |     |    \n");
+				printf("\t\t\t     |          C O D  |               / )  /               |  |  |    \n");
+				printf("\t\t\t     | Dar Flor  *Y*   |     Escuchar .)(-{         Volver  |     |    \n");
+				printf("\t\t\t     |_           |   _|               \\_b                  |  |  |    \n");
 				break;
 
 			case 2:
-				printf("\t\t\t                 .n.        _           /.  \\_              |     |\n");
-				printf("\t\t\t                C O D      |           / )  / |             |  |  |\n");
-				printf("\t\t\t       Dar Flor  *Y*       | Escuchar .)(-{   |     Volver  |     |\n");
-				printf("\t\t\t                  |        |_          \\_b   _|             |  |  |\n");
+				printf("\n");
+				printf("\t\t\t                 .n.        _           /.  \\_              |     |    \n");
+				printf("\t\t\t                C O D      |           / )  / |             |  |  |    \n");
+				printf("\t\t\t       Dar Flor  *Y*       | Escuchar .)(-{   |     Volver  |     |    \n");
+				printf("\t\t\t                  |        |_          \\_b   _|             |  |  |    \n");
 				break;
 
 			case 3:
-				printf("\t\t\t                 .n.                    /.  \\      _        |     | _\n");
-				printf("\t\t\t                C O D                  / )  /     |         |  |  |  |\n");
-				printf("\t\t\t       Dar Flor  *Y*         Escuchar .)(-{       | Volver  |     |  |\n");
-				printf("\t\t\t                  |                    \\_b        |_        |  |  | _|\n");
+				printf("\n");
+				printf("\t\t\t                 .n.                    /.  \\      _        |     | _  \n");
+				printf("\t\t\t                C O D                  / )  /     |         |  |  |  |  \n");
+				printf("\t\t\t       Dar Flor  *Y*         Escuchar .)(-{       | Volver  |     |  |  \n");
+				printf("\t\t\t                  |                    \\_b        |_        |  |  | _|  \n");
 				break;
 			
 			default:
@@ -579,7 +610,8 @@ int menuDeVecino(){
 						// strcpy(vecinoMensajeError, "\n\tERROR: Se te acabo la energia social!  .  :.\t(Puedes cargarla en casa)");
 
 					} else{
-						cls();
+						// printf("\e[%iA", 6);
+						// cls();
 						NDL.HP = NDL.HP - 25;
 						contador = contador + 1;
 						vecinoContadorDeEscuchas = vecinoContadorDeEscuchas + 1;
@@ -614,6 +646,20 @@ int menuDeVecino(){
 				case 3:
 					NDL.ubi.y--;
 					// VOLVES A LA CALLE
+
+					printf("\e[%iA", 9);
+
+					//estos printfs borran el hud del vecino antes de salir a la calle
+					// printf("                                                                                                                       ");
+					// printf("\n                                                                                                                       ");
+					// printf("\n                                                                                                                       ");
+					// printf("\n                                                                                                                       ");
+					// printf("\n                                                                                                                       ");
+					// printf("\n                                                                                                                       ");
+					// printf("\n                                                                                                                       ");
+					// printf("\n                                                                                                                       ");
+					// printf("\n                                                                                                                       ");
+
 					return 2;
 					break;
 				
@@ -626,6 +672,9 @@ int menuDeVecino(){
 			break;
 		}
 
+		printf("\e[%iA", 5);
+
+	//este while hay q cambiarlo porq no se va a poder guardar partida en un vecino
 	}while(vecinoInput != '.');
 }
 
@@ -651,7 +700,9 @@ int dibujarEscena(char d[max][max2], int loc){
     int j, i;
 	int rAux;
 
-    cls();
+    // cls();
+	printf("\e[%iA", 600);
+
     // printf("\n\n\n\n\n\n\n");
     printf("\n\n\n\n\n");
     switch(loc){
@@ -731,26 +782,35 @@ int dibujarEscena(char d[max][max2], int loc){
 				return 1;
             }
 
+			printf("\n                                                                                                                       ");
+
 			// DIBUJA CANTIDAD DE ENERGIA
 			switch (NDL.HP){
 				case 100:
-					printf("\n\n\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++++] \n");
+					printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++++] \n");
 					break;
 				case 75:
-					printf("\n\n\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++__] \n");
+					printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++__] \n");
 					break;
 				case 50:
-					printf("\n\n\n\t\t\t\t\t\tENERGIA SOCIAL: [++++____] \n");
+					printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++____] \n");
 					break;
 				case 25:
-					printf("\n\n\n\t\t\t\t\t\tENERGIA SOCIAL: [++______] \n");
+					printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++______] \n");
 					break;
 				case 0:
-					printf("\n\n\n\t\t\t\t\t\tENERGIA SOCIAL: [________] \n");
+					printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [________] \n");
 					break;
 				default:
 					break;
 			}
+			printf("                                                                                                                       ");
+			printf("\n                                                                                                                       ");
+			printf("\n                                                                                                                       ");
+			printf("\n                                                                                                                       ");
+			printf("\n                                                                                                                       ");
+			printf("\n                                                                                                                       ");
+			printf("\n                                                                                                                        ");
 
 			printf("\e[?25l");	//ESCONDE EL "CURSOR"
             break;
@@ -787,6 +847,9 @@ int dibujarEscena(char d[max][max2], int loc){
             for(i = max-1; i > 0; i--){
                 printf("                              ");
                 for(j = 1; j < max2; j++){
+
+
+					
                     if((NDL.calleLoc == NDL.misionesCumplidas) && (NDL.misionesCumplidas > 0) && ((j == entyCoor[1].x) && (i == entyCoor[1].y) || (j == entyCoor[2].x) && (i == entyCoor[2].y) || (j == entyCoor[3].x) && (i == entyCoor[3].y))){
                         printf("GB-");
                         j = j + 2;
@@ -802,6 +865,16 @@ int dibujarEscena(char d[max][max2], int loc){
                 }
                 printf("\n");
             }
+
+			// printf("                                                                                                                       ");
+			// printf("\n                                                                                                                       ");
+			// printf("\n                                                                                                                       ");
+			// printf("\n                                                                                                                       ");
+			// printf("\n                                                                                                                       ");
+			// printf("\n                                                                                                                       ");
+			// printf("\n                                                                                                                       ");
+			// printf("\n                                                                                                                       ");
+			// printf("\n                                                                                                                       ");
 
 			// 		ESTOS IF CHEKEAN SI HACES CONTACTO CON ALGO
 			// ENTRAR A CASA

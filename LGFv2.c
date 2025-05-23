@@ -1,14 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <time.h>
-//#include <conio.h>
-#include <pthread.h>
-
-#include <assert.h>
-#include <unistd.h>
-
 #include "ingame.h"
 
 int main() {
@@ -26,18 +15,23 @@ int main() {
 	// fprintf(save, "1000000025");
 	// fclose(save);
 
+	cls();
 
 
     // MAIN MENU
 	do{
         // system("cls");
-		cls();
-		printf("-----------------------------------------------------------------------------------------------------------------------+");
+		// cls();
+
+		//DEVUELVE EL CURSOR AL PRINCIPIO DEL TERMINAL
+		printf("\e[%iA", 600);
+
+		// printf("-----------------------------------------------------------------------------------------------------------------------+");
 		printf("\n\n\n\n\n");
 		if (access("save.txt", F_OK) == 0) {
-	        printf("\n\n\t\t\t\t\t\tOPCIONES\n\n\t\t\t\t\t\t\t 1.CONTINUAR\n\t\t\t\t\t\t\t 2.CONFIG\n\t\t\t\t\t\t\t 3.SALIR\n\t\t\t\t\t\t\t 4.BORRAR PARTIDA\n\n\n\n\n");
+	        printf("\n\n\tOPCIONES\n\n\t\t 1.CONTINUAR  	\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\t\t 4.GUARDAR PARTIDA\n\t\t 5.BORRAR PARTIDA\n\n\n\n");
 		} else {
-			printf("\n\n\t\t\t\t\t\tOPCIONES\n\n\t\t\t\t\t\t\t 1.JUGAR\n\t\t\t\t\t\t\t 2.CONFIG\n\t\t\t\t\t\t\t 3.SALIR\n\n\n\n\n\n");
+			printf("\n\n\tOPCIONES\n\n\t\t 1.JUGAR\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\n\n\n\n\n");
 		}
 
 
@@ -52,7 +46,8 @@ int main() {
 		printf("\n                            A  S  D    /    FLECHAS                BARRA ESPACIADORA                                    ");
 
 		// printf("\n\n\n\n                                                                                                                       A");
-		printf("\n\n\n\n-----------------------------------------------------------------------------------------------------------------------+");
+		// printf("\n\n\n\n-----------------------------------------------------------------------------------------------------------------------+");
+		printf("\n\n\n\n                                                                                                                       +");
 		op = getch();
 		switch(op){
 			case '1':
@@ -62,21 +57,26 @@ int main() {
 				
 			case '2':
 				// ABRIR CONFIG.
-				cls();
+				// cls();
 				break;
 
 			case '3':
 				// CERRAR EL JUEGO
 				cls();
                 return 0;
+				break;
 
 			case '4':
+				// GUARDAR PARTIDA
+				guardarPartida(&NDL);
+				break;
+
+			case '5':
 				// BORRAR PARTIDA GUARDADA
 				cls();
 				if (access("save.txt", F_OK) == 0) {
 					remove("save.txt");
 				}
-
 				break;
 
 			default:
