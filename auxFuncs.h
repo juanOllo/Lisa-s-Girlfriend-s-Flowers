@@ -3,13 +3,15 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+// #include <pthread.h>
+
+// #include <assert.h>
+#include <unistd.h>
+
+// ESTOS AUX SON PARA QUE FUNCIONE getch() y cls()
 //#include <conio.h>
 #include "auxWin.h"
 //#include "auxUbu.h"
-#include <pthread.h>
-
-#include <assert.h>
-#include <unistd.h>
 
 #define max 16
 #define max2 60
@@ -22,16 +24,23 @@ typedef struct {
 } coor;
 
 struct NoviaDeLisa {
-	int HP; // NDL.HP
-	int cantFlores;
-	int misionesCumplidas;
-	int primeraVez;
-	int lucides[4];
-	coor ubi;
-	int calleLoc;
+	int HP;                 //puntos de hp de ndl
+	int cantFlores;         //cantidad de flores en mano
+	int misionesCumplidas;  //cantidad de flores entregadas
+	int primeraVez;         //aux q voy a usar para las cinematicas creo
+	int lucides[4];         //guarda las veces q gastaste todos los dialogos a cada vecino
+	coor ubi;               //ubicacion actual de ndl
+	int calleLoc;           //en que seccion del juego se encuentra ndl
 };
 
-// int proximo(coor u, coor e);
+
+
+
+
+
+
+
+
 
 
 
@@ -56,6 +65,16 @@ void matrisDebug(char matris[max][max2]){
 
 	fclose(errors);
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -123,6 +142,8 @@ void cargaDeEscena(char d[max][max2], int l){
 // CHECKEA EL ESTADO ENTRE LAS DOS UBICACIONES 
 int proximo(coor u, coor e){
     
+    // es e.x+"4" porq lo hice pensando en el tamaño de las abejas creo
+    //  capaz haya q cambiarlo si lo voy a usar para algo mas al return 2
     if((e.x+4>u.x && u.x>e.x-2) && (e.y+2>u.y && u.y>e.y-2)){
         if(e.x==u.x && e.y==u.y){
             return 2; //Están en el mismo lugar 
@@ -265,80 +286,41 @@ void error(char errorMsj[100]){
 //                 ubi actual    input del                                      casa = 0
 //                 de NDL        teclado        escLimitCalle/Casa              calle = 1
 coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle) {
-    coor movimientoAux = actualUbi;
+    coor nuevaUbiAux = actualUbi;
 
-    switch (casaOCalle){
-        // CUANDO ESTAS EN CASA
-        case 0:
-        
-            switch (input){
-                case 'd':
-                case 'D':
-                case 'M':
-                    movimientoAux.x = movimientoAux.x + 3;
-                    break;
-                case 'a':
-                case 'A':
-                case 'K':
-                    movimientoAux.x = movimientoAux.x - 3;
-                    break;
-                case 'w':
-                case 'W':
-                case 'H':
-                    movimientoAux.y = movimientoAux.y + 1;
-                    break;
-                case 's':
-                case 'S':
-                case 'P':
-                    movimientoAux.y = movimientoAux.y - 1;
-                    break;
-                default:
-                    break;
-            }
+    switch (input){
+        case 'd':
+        case 'D':
+        case 'M':
+            nuevaUbiAux.x = nuevaUbiAux.x + (3 - casaOCalle);
             break;
-        
-        // CUANDO ESTAS EN LA CALLE
-        case 1:
-
-            switch (input){
-                case 'd':
-                case 'D':
-                case 'M':
-                    movimientoAux.x = movimientoAux.x + 2;
-                    break;
-                case 'a':
-                case 'A':
-                case 'K':
-                    movimientoAux.x = movimientoAux.x - 2;
-                    break;
-                case 'w':
-                case 'W':
-                case 'H':
-                    movimientoAux.y = movimientoAux.y + 1;
-                    break;
-                case 's':
-                case 'S':
-                case 'P':
-                    movimientoAux.y = movimientoAux.y - 1;
-                    break;
-                default:
-                    break;
-            }
+        case 'a':
+        case 'A':
+        case 'K':
+            nuevaUbiAux.x = nuevaUbiAux.x - (3 - casaOCalle);
             break;
-            
+        case 'w':
+        case 'W':
+        case 'H':
+            nuevaUbiAux.y = nuevaUbiAux.y + 1;
+            break;
+        case 's':
+        case 'S':
+        case 'P':
+            nuevaUbiAux.y = nuevaUbiAux.y - 1;
+            break;
         default:
             break;
     }
 
-
-    if(movimientoLimit[max - movimientoAux.y][movimientoAux.x] == '#' 
+    if(movimientoLimit[max - nuevaUbiAux.y][nuevaUbiAux.x] == '#' 
         // ||
-        // movimientoAux.y<0
+        // nuevaUbiAux.y<0
     ) {
         error("ubo un error");
         return actualUbi;
     } else {
-        return movimientoAux;
+        return nuevaUbiAux;
     }
 }
 

@@ -6,17 +6,9 @@ int main() {
 
     char op;
 
-
-
-	// FILE *save;
-	// save = fopen("save.txt", "r");
-	// fclose(save);
-
-	// fprintf(save, "1000000025");
-	// fclose(save);
-
 	cls();
-
+	
+	printf("\e[?25l");	//ESCONDE EL "CURSOR" (PARA SIEMPRE)
 
     // MAIN MENU
 	do{
@@ -29,14 +21,13 @@ int main() {
 		// printf("-----------------------------------------------------------------------------------------------------------------------+");
 		printf("\n\n\n\n\n");
 		if (access("save.txt", F_OK) == 0) {
-	        printf("\n\n\tOPCIONES\n\n\t\t 1.CONTINUAR  	\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\t\t 4.GUARDAR PARTIDA\n\t\t 5.BORRAR PARTIDA\n\n\n\n");
+	        printf("\n\n\t\t   MENU\n\n\t\t 1.CONTINUAR  	\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\t\t 4.GUARDAR PARTIDA\n\t\t 5.BORRAR PARTIDA\n\n\n\n");
 		} else {
-			printf("\n\n\tOPCIONES\n\n\t\t 1.JUGAR\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\n\n\n\n\n");
+			printf("\n\n\t\t   MENU\n\n\t\t 1.JUGAR\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\n\n\n\n\n");
 		}
 
 
 
-		printf("\e[?25l");	//ESCONDE EL "CURSOR"
 		// printf("\ntu ch es: %c", op);
 		printf("\n\n\n                                                                                                                        ");
 		printf("\n                                                     CONTROLES                                                          ");
