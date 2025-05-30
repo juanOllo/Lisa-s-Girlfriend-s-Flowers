@@ -16,7 +16,7 @@ int main() {
 		// cls();
 
 		//DEVUELVE EL CURSOR AL PRINCIPIO DEL TERMINAL
-		printf("\e[%iA", 600);
+		printf("\e[%iA", 100);
 
 		// printf("-----------------------------------------------------------------------------------------------------------------------+");
 		printf("\n\n\n\n\n");

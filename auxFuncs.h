@@ -283,35 +283,83 @@ void error(char errorMsj[100]){
 
 
 // FUNCION QUE DEVUELVE NUEVA UBI DE NDL CUANDO TE MOVES RESPETANDO LIMITES
-//                 ubi actual    input del                                      casa = 0
-//                 de NDL        teclado        escLimitCalle/Casa              calle = 1
+//                 input del      ubi actual                                    casa = 0
+//                 teclado        de ndl        escLimitCalle/Casa              calle = 1
+//                                                                              calle = 3
 coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle) {
     coor nuevaUbiAux = actualUbi;
+    // isOk sirve para q no redibuje la escena si no entro un input correcto
+    int isOk;
 
-    switch (input){
-        case 'd':
-        case 'D':
-        case 'M':
-            nuevaUbiAux.x = nuevaUbiAux.x + (3 - casaOCalle);
+    do{
+        isOk = 1;
+
+        switch (casaOCalle){
+            case 3:
+                switch (input){
+                    case 'd':
+                    case 'D':
+                    case 'M':
+                        nuevaUbiAux.x = nuevaUbiAux.x + 2;
+                        break;
+                    // case 'a':
+                    // case 'A':
+                    // case 'K':
+                    //     nuevaUbiAux.x = nuevaUbiAux.x - 2;
+                    //     break;
+                    case 'w':
+                    case 'W':
+                    case 'H':
+                        nuevaUbiAux.y = nuevaUbiAux.y + 2;
+                        break;
+                    case 's':
+                    case 'S':
+                    case 'P':
+                        nuevaUbiAux.y = nuevaUbiAux.y - 2;
+                        break;
+                    case '.':
+                        break;
+                    default:
+                        isOk = 0;
+                        input = getch();
+                        break;
+                }
             break;
-        case 'a':
-        case 'A':
-        case 'K':
-            nuevaUbiAux.x = nuevaUbiAux.x - (3 - casaOCalle);
+        
+            default:
+                switch (input){
+                    case 'd':
+                    case 'D':
+                    case 'M':
+                        nuevaUbiAux.x = nuevaUbiAux.x + (3 - casaOCalle);
+                        break;
+                    case 'a':
+                    case 'A':
+                    case 'K':
+                        nuevaUbiAux.x = nuevaUbiAux.x - (3 - casaOCalle);
+                        break;
+                    case 'w':
+                    case 'W':
+                    case 'H':
+                        nuevaUbiAux.y = nuevaUbiAux.y + 1;
+                        break;
+                    case 's':
+                    case 'S':
+                    case 'P':
+                        nuevaUbiAux.y = nuevaUbiAux.y - 1;
+                        break;
+                    case '.':
+                        break;
+                    default:
+                        isOk = 0;
+                        input = getch();
+                        break;
+                }
             break;
-        case 'w':
-        case 'W':
-        case 'H':
-            nuevaUbiAux.y = nuevaUbiAux.y + 1;
-            break;
-        case 's':
-        case 'S':
-        case 'P':
-            nuevaUbiAux.y = nuevaUbiAux.y - 1;
-            break;
-        default:
-            break;
-    }
+        }
+    // }while (actualUbi.x == nuevaUbiAux.x && actualUbi.y == nuevaUbiAux.y);
+    }while (isOk == 0);
+    
 
     if(movimientoLimit[max - nuevaUbiAux.y][nuevaUbiAux.x] == '#' 
         // ||
@@ -359,8 +407,20 @@ void cinematica(int l/*line*/){
         inicio++;
     }
 
-	cls();
-    printf("\n\n\n\n\n\n\n");
+	// cls();
+    printf("\e[%iA", 100);
+    
+    // printf("\n\n\n\n\n\n\n");
+    printf("                                                                                               \n");
+    printf("                                                                                               \n");
+    printf("                                                                                               \n");
+    printf("                                                                                               \n");
+    printf("                                                                                               \n");
+    printf("                                                                                               \n");
+    printf("                                                                                               \n");
+
+
+
     // printf("\n\n\n\n\n");
     
     if(f != NULL){
@@ -377,6 +437,14 @@ void cinematica(int l/*line*/){
     }
 
 	fclose(f);
+
+    // printf("                                                                                               \n");
+    // printf("                                                                                               \n");
+    // printf("                                                                                               \n");
+    // printf("                                                                                               \n");
+    // printf("                                                                                               \n");
+    // printf("                                                                                               \n");
+    // printf("                                                                                               \n");
 }
 
 // void cinematica2(int l/*line*/){
@@ -564,4 +632,46 @@ void guardarPartida(struct NoviaDeLisa *ndl){
 	save = fopen("save.txt", "w");
 	fprintf(save, toSaveArray);
 	fclose(save);
+}
+
+
+
+
+
+
+
+
+void actualizarHP(int hp){
+
+    printf("\e[%iA", 100);
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
+    switch (hp){
+        case 100:
+            printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++++] \n");
+            break;
+        case 75:
+            printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++__] \n");
+            break;
+        case 50:
+            printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++____] \n");
+            break;
+        case 25:
+            printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++______] \n");
+            break;
+        case 0:
+            printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [________] \n");
+            break;
+        default:
+            break;
+    }
+    printf("                                                                                                                       ");
+    printf("\n                                                                                                                       ");
+    printf("\n                                                                                                                       ");
+    printf("\n                                                                                                                       ");
+    printf("\n                                                                                                                       ");
+    // printf("\n                                                                                                                       ");
+    // printf("\n                                                                                                                        ");
+    
+    printf("\e[%iA", 100);
 }

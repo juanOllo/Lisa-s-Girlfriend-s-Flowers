@@ -312,3 +312,11 @@ extern "C" {
 void cls() {
   system("cls");
 }
+
+// void cls() {
+// 		printf("\e[%iA", 100);
+//     for (int i = 0; i < 25; i++){
+// 		  printf("\n                                                                                                                        ");      
+//     }
+// 		printf("\e[%iA", 100);
+// }
