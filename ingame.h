@@ -36,6 +36,7 @@ char saveArray[16];
 
 
 coor obstaculos[5];
+coor balones[6];
 
 
 
@@ -627,6 +628,9 @@ int menuDeVecino(){
 									freeze(3);
 								}
 
+								NDL.misionesCumplidas++;
+								NDL.cantFlores = 0;
+
 								// reinicia ubi de ndl cuando vuelve a casa
 								NDL.ubi.x = 31;
 								NDL.ubi.y = 6;	
@@ -748,42 +752,190 @@ int vecinoGameplay(){
 	int x = 1;
 	char input;
 
-	cargaDeEscena(escVecino, 171);
-	cargaDeEscena(escVecinoLimit, 188);
+	switch (NDL.misionesCumplidas){
+		case 0:
+			cargaDeEscena(escVecino, 171);
+			cargaDeEscena(escVecinoLimit, 188);
 
-	// do{
-		NDL.ubi.x = 10;
-		NDL.ubi.y = 7;
+			// do{
+				NDL.ubi.x = 10;
+				NDL.ubi.y = 7;
 
-		x = dibujarEscena(escVecino, 3);
+				x = dibujarEscena(escVecino, 3);
 
-		// ESTOS if SON PARA BORRAR EL HUD DEL MENU DEL VECINO
-		printf("                                                                                                                       ");
-		printf("\n                                                                                                                       ");
-		printf("\n                                                                                                                       ");
-		printf("\n                                                                                                                       ");
-		printf("\n                                                                                                                       ");
-		printf("\n                                                                                                                       ");
+				// ESTOS if SON PARA BORRAR EL HUD DEL MENU DEL VECINO
+				printf("                                                                                                                       ");
+				printf("\n                                                                                                                       ");
+				printf("\n                                                                                                                       ");
+				printf("\n                                                                                                                       ");
+				printf("\n                                                                                                                       ");
+				printf("\n                                                                                                                       ");
 
-		actualizarHP(NDL.HP);
+				actualizarHP(NDL.HP);
 
-		for (int i = 0; i < 5; i++)	{
-			obstaculos[i].x = 32 + (i*8);
-			obstaculos[i].y = 11 - (i*2);
-		}
+				for (int i = 0; i < 5; i++)	{
+					obstaculos[i].x = 32 + (i*8);
+					obstaculos[i].y = 11 - (i*2);
+				}
 
-		do{
-			input = getch();
-			NDL.ubi = movimiento(input, NDL.ubi, escVecinoLimit, 3);
-			x = dibujarEscena(escVecino, 3);
+				do{
+					input = getch();
+					NDL.ubi = movimiento(input, NDL.ubi, escVecinoLimit, 3);
+					x = dibujarEscena(escVecino, 3);
 
-		} while (input != '.' && x == 0);
+				} while (input != '.' && x == 0);
 
-	// }while(x == 1);
-	
-	NDL.ubi = auxUbi;
+			// }while(x == 1);
+			
+			NDL.ubi = auxUbi;
 
-	return x;
+			return x;
+			break;
+		
+		case 1:
+			cargaDeEscena(escVecino, 205);
+			cargaDeEscena(escVecinoLimit, 222);
+
+			// do{
+				NDL.ubi.x = 30;
+				NDL.ubi.y = 4;
+
+				// PARA OCULTAR LOS BALONES CUANDO REINICIAR EL MINIJUEGO DESP DE UN IMPACTO
+				for (int b = 1; b < 6; b++){
+					balones[b].x = 100;
+					balones[b].y = 100;
+				}
+				
+
+				balones[0].x = 30;
+				balones[0].y = 12;
+
+				x = dibujarEscena(escVecino, 4);
+
+				// ESTOS if SON PARA BORRAR EL HUD DEL MENU DEL VECINO
+				printf("                                                                                                                       ");
+				printf("\n                                                                                                                       ");
+				printf("\n                                                                                                                       ");
+				printf("\n                                                                                                                       ");
+				printf("\n                                                                                                                       ");
+				printf("\n                                                                                                                       ");
+
+				actualizarHP(NDL.HP);
+
+				balones[5].x = 30;
+				balones[5].y = 16;
+
+				balones[1].x = 15;
+				balones[1].y = NDL.ubi.y;
+
+				balones[2].x = 50;
+				balones[2].y = NDL.ubi.y;
+
+				balones[3].x = -5;
+				balones[3].y = NDL.ubi.y + 2;
+
+				balones[4].x = 70;
+				balones[4].y = NDL.ubi.y + 2;
+
+				// ARREGLO CON LOS VECINO
+				int los3Vecinos[3];
+				for (int v = 0; v < 3; v++){
+					los3Vecinos[v] = 0;
+				}
+
+				do{
+					NDL.ubi = movimiento2(NDL.ubi, escVecinoLimit, 4);
+					x = dibujarEscena(escVecino, 4);
+
+					// x=3 SIGNIFICA QUE ENTREGASTE UNA FLOR
+					if (x == 3){
+
+						// CHECKEA A QUE VECINO LE ENTREGASTE LA FLOR
+						switch (NDL.ubi.x){
+							case 30:
+								los3Vecinos[0] = 1;
+								escVecino[2][30] = 'X';
+								escVecino[2][31] = 'X';
+
+								escVecino[3][29] = ' ';
+								escVecino[3][30] = ' ';
+								escVecino[3][31] = ' ';
+								escVecino[3][32] = ' ';
+								escVecino[3][33] = ' ';
+
+								escVecino[4][30] = ' ';
+								escVecino[4][31] = ' ';
+
+								escVecinoLimit[4][30] = '#';
+
+								NDL.ubi.y = 10;
+								x = dibujarEscena(escVecino, 4);
+								break;
+
+							case 10:
+								los3Vecinos[1] = 1;
+								escVecino[9][7] = 'X';
+								escVecino[9][8] = 'X';
+								
+								escVecino[10][6] = ' ';
+								escVecino[10][7] = ' ';
+								escVecino[10][8] = ' ';
+								escVecino[10][9] = ' ';
+
+								escVecino[11][7] = ' ';
+								escVecino[11][8] = ' ';
+
+								escVecinoLimit[10][10] = '#';
+
+								NDL.ubi.x = 15;
+								x = dibujarEscena(escVecino, 4);
+								break;
+
+							case 50:
+								los3Vecinos[2] = 1;
+								escVecino[9][53] = 'X';
+								escVecino[9][54] = 'X';
+																
+								escVecino[10][51] = ' ';
+								escVecino[10][52] = ' ';
+								escVecino[10][53] = ' ';
+								escVecino[10][54] = ' ';
+								escVecino[10][55] = ' ';
+
+								escVecino[11][53] = ' ';
+								escVecino[11][54] = ' ';
+
+								escVecinoLimit[10][50] = '#';
+
+								NDL.ubi.x = 45;
+								x = dibujarEscena(escVecino, 4);
+								break;
+							
+							default:
+								break;
+						}						
+						
+						// SI ENTREGASTE LAS 3 FLORES EL MINIJUEGO TERMINA
+						if ((los3Vecinos[0] + los3Vecinos[1] + los3Vecinos[2]) == 3){
+							cinematica(188);
+							freeze(2);
+							x = 3;
+						}
+					}
+					
+
+				} while (input != '.' && x == 0);
+
+			// }while(x == 1);
+			
+			NDL.ubi = auxUbi;
+
+			return x;
+			break;
+
+		default:
+			break;
+	}
 }
 
 
@@ -890,38 +1042,6 @@ int dibujarEscena(char d[max][max2], int loc){
 				return 1;
             }
 
-			// printf("\n                                                                                                                       ");
-
-			// DIBUJA CANTIDAD DE ENERGIA
-			// switch (NDL.HP){
-			// 	case 100:
-			// 		printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++++] \n");
-			// 		break;
-			// 	case 75:
-			// 		printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++__] \n");
-			// 		break;
-			// 	case 50:
-			// 		printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++____] \n");
-			// 		break;
-			// 	case 25:
-			// 		printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++______] \n");
-			// 		break;
-			// 	case 0:
-			// 		printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [________] \n");
-			// 		break;
-			// 	default:
-			// 		break;
-			// }
-
-			// ESTOS if SON PARA BORRAR EL HUD DEL MENU
-			// printf("                                                                                                                       ");
-			// printf("\n                                                                                                                       ");
-			// printf("\n                                                                                                                       ");
-			// printf("\n                                                                                                                       ");
-			// printf("\n                                                                                                                       ");
-			// printf("\n                                                                                                                       ");
-			// printf("\n                                                                                                                        ");
-
             break;
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -990,7 +1110,7 @@ int dibujarEscena(char d[max][max2], int loc){
             break;
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-		case 3:											//DIBUJA LA ESCENA DEL VECINO
+		case 3:											//DIBUJA LA ESCENA DEL VECINO 1
 			
 			// CHECKEA SI LLEGASTE AL VECINO
 			if (NDL.ubi.x > 50 && NDL.ubi.y < 10 && NDL.ubi.y > 4){
@@ -1050,6 +1170,99 @@ int dibujarEscena(char d[max][max2], int loc){
 				}
 			}
 
+			break;
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+		case 4:											//DIBUJA LA ESCENA DEL VECINO 2
+			
+			// CHECKEA SI LLEGASTE A ALGUN VECINO
+			if (NDL.ubi.y == 12 || NDL.ubi.x == 10 || NDL.ubi.x == 50){
+				return 3;
+			}
+			
+
+			// ESTE FOR SOLO DIBUJA LA ESCENA
+            for(int i = max-1; i > 0; i--){
+                printf("                              ");
+                for(int j = 1; j < max2; j++){
+
+					if (((j == balones[0].x+1) && (i == balones[0].y+1)) || ((j == balones[5].x) && (i == balones[5].y+1))){
+						printf("s");
+
+					}else if(((j == balones[0].x) && (i == balones[0].y)) || ((j == balones[5].x) && (i == balones[5].y))){
+                        printf("()");
+						j = j+1;
+
+                    }else if (((j == balones[1].x) && (i == balones[1].y)) || ((j == balones[3].x) && (i == balones[3].y))){
+						printf("~O)");
+						j = j+2;
+
+					}else if(((j == balones[2].x-1) && (i == balones[2].y)) || ((j == balones[4].x-1) && (i == balones[4].y))){
+						printf("(O~");
+						j = j+2;
+
+					}else if((j == NDL.ubi.x) && (i == NDL.ubi.y)){
+                        printf("L*");
+						j++;
+                    } else{
+                        printf("%c", d[max-i][j]);
+                    }
+                }
+				// este prntf es para borrar el obstaculo q se buguea a la derecha del vecino
+                printf("               ");
+                printf("\n");
+            }
+			
+			// PRIMERO CHECKEA SI TE IMPACTA UN BALON
+			// 	SINO ACTUALIZA LA UBI DEL BALON EN EL switch DE ABAJO
+			for (int b = 0; b < 6; b++){
+				if (proximo(NDL.ubi, balones[b]) > 0){
+					NDL.HP = NDL.HP - 25;
+					freeze(1);
+					// si perdiste todo el hp volves a casa y alguien entrego la flor por vos
+					if(NDL.HP == 0){	return 2;	}
+					// sino sale del minijuego pero seguis en el vecino
+					return 1;
+				}
+
+				// TODOS LOS if RESTARTEAN LA UBI DE LOS BALONES SI SE PASAN DE LARGO
+				// 	SINO SOLO SE MUEVEN
+				switch (b){
+					case 0:
+					case 5:
+						if(balones[b].y < 4){
+							balones[b].y = 12;
+							balones[b].x = NDL.ubi.x;
+						} else{
+							balones[b].y = balones[b].y - 2;
+						}
+						break;
+
+					case 1:
+					case 3:
+						if(balones[b].x > 40){
+							balones[b].x = 10;
+							balones[b].y = NDL.ubi.y;
+						} else{
+							balones[b].x = balones[b].x + 5;
+						}
+						break;
+
+					case 2:
+					case 4:
+						if(balones[b].x < 20){
+							balones[b].x = 50;
+							balones[b].y = NDL.ubi.y;
+						} else{
+							balones[b].x = balones[b].x - 5;
+						}
+						break;
+					
+					default:
+						break;
+				}
+				
+			}
 			break;
 
         default:

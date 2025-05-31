@@ -10,8 +10,8 @@
 
 // ESTOS AUX SON PARA QUE FUNCIONE getch() y cls()
 //#include <conio.h>
-#include "auxWin.h"
-//#include "auxUbu.h"
+#include "auxLibsWin.h"
+// #include "auxLibsUbu.h"
 
 #define max 16
 #define max2 60
@@ -285,7 +285,8 @@ void error(char errorMsj[100]){
 // FUNCION QUE DEVUELVE NUEVA UBI DE NDL CUANDO TE MOVES RESPETANDO LIMITES
 //                 input del      ubi actual                                    casa = 0
 //                 teclado        de ndl        escLimitCalle/Casa              calle = 1
-//                                                                              calle = 3
+//                                                                              vecino1 = 3
+//                                                                              vecino2 = 4
 coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle) {
     coor nuevaUbiAux = actualUbi;
     // isOk sirve para q no redibuje la escena si no entro un input correcto
@@ -307,6 +308,37 @@ coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], in
                     // case 'K':
                     //     nuevaUbiAux.x = nuevaUbiAux.x - 2;
                     //     break;
+                    case 'w':
+                    case 'W':
+                    case 'H':
+                        nuevaUbiAux.y = nuevaUbiAux.y + 2;
+                        break;
+                    case 's':
+                    case 'S':
+                    case 'P':
+                        nuevaUbiAux.y = nuevaUbiAux.y - 2;
+                        break;
+                    case '.':
+                        break;
+                    default:
+                        isOk = 0;
+                        input = getch();
+                        break;
+                }
+            break;
+
+            case 4:
+                switch (input){
+                    case 'd':
+                    case 'D':
+                    case 'M':
+                        nuevaUbiAux.x = nuevaUbiAux.x + 5;
+                        break;
+                    case 'a':
+                    case 'A':
+                    case 'K':
+                        nuevaUbiAux.x = nuevaUbiAux.x - 5;
+                        break;
                     case 'w':
                     case 'W':
                     case 'H':
@@ -365,13 +397,78 @@ coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], in
         // ||
         // nuevaUbiAux.y<0
     ) {
-        error("ubo un error");
+        // error("colision");
         return actualUbi;
     } else {
         return nuevaUbiAux;
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+// FUNCION QUE DEVUELVE NUEVA UBI DE NDL CUANDO TE MOVES RESPETANDO LIMITES
+//                    ubi actual                                    casa = 0
+//                    de ndl        escLimitCalle/Casa/Vecino       calle = 1
+//                                                                  vecino1 = 3
+//                                                                  vecino2 = 4
+coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle){
+
+    coor nuevaUbiAux;
+    // isOk sirve para q no redibuje la escena si no entro un input correcto
+    char input;
+
+     do{
+        nuevaUbiAux = actualUbi;
+        input = getch();
+
+        switch (casaOCalle){
+            case 4:
+                switch (input){
+                    case 'd':
+                    case 'D':
+                    case 'M':
+                        nuevaUbiAux.x = nuevaUbiAux.x + 5;
+                        break;
+                    case 'a':
+                    case 'A':
+                    case 'K':
+                        nuevaUbiAux.x = nuevaUbiAux.x - 5;
+                        break;
+                    case 'w':
+                    case 'W':
+                    case 'H':
+                        nuevaUbiAux.y = nuevaUbiAux.y + 2;
+                        break;
+                    case 's':
+                    case 'S':
+                    case 'P':
+                        nuevaUbiAux.y = nuevaUbiAux.y - 2;
+                        break;
+                    // case '.':
+                    //     break;
+                    default:
+                        break;
+                }
+            break;
+        
+            default:
+            break;
+        }
+
+    }while (movimientoLimit[max - nuevaUbiAux.y][nuevaUbiAux.x] == '#');
+
+    return nuevaUbiAux;
+}
 
 
 
@@ -588,27 +685,26 @@ void guardarPartida(struct NoviaDeLisa *ndl){
     sprintf(&toSaveArray[5], "%d", ndl->lucides[2]);
     sprintf(&toSaveArray[6], "%d", ndl->lucides[3]);
 
-    switch (ndl->HP)
-    {
-    case 100:
-        sprintf(&toSaveArray[7], "%d", ndl->HP);
-        break;
-    
-    case 25:
-    case 50:
-    case 75:
-        sprintf(&toSaveArray[7], "%d", 0);
-        sprintf(&toSaveArray[8], "%d", ndl->HP);
-        break;
+    switch (ndl->HP){
+        case 100:
+            sprintf(&toSaveArray[7], "%d", ndl->HP);
+            break;
+        
+        case 25:
+        case 50:
+        case 75:
+            sprintf(&toSaveArray[7], "%d", 0);
+            sprintf(&toSaveArray[8], "%d", ndl->HP);
+            break;
 
-    case 0:
-        sprintf(&toSaveArray[7], "%d", 0);
-        sprintf(&toSaveArray[8], "%d", 0);
-        sprintf(&toSaveArray[9], "%d", ndl->HP);
-        break;
-    
-    default:
-        break;
+        case 0:
+            sprintf(&toSaveArray[7], "%d", 0);
+            sprintf(&toSaveArray[8], "%d", 0);
+            sprintf(&toSaveArray[9], "%d", ndl->HP);
+            break;
+        
+        default:
+            break;
     }
 
     if(ndl->ubi.x > 9){
@@ -672,6 +768,6 @@ void actualizarHP(int hp){
     printf("\n                                                                                                                       ");
     // printf("\n                                                                                                                       ");
     // printf("\n                                                                                                                        ");
-    
+
     printf("\e[%iA", 100);
 }
