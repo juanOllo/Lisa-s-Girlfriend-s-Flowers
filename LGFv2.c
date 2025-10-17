@@ -12,37 +12,38 @@ int main() {
 
     // MAIN MENU
 	do{
-        // system("cls");
-		// cls();
-
 		//DEVUELVE EL CURSOR AL PRINCIPIO DEL TERMINAL
 		printf("\e[%iA", 100);
 
-		// printf("-----------------------------------------------------------------------------------------------------------------------+");
+		//DEVUELVE EL CURSOR AL PRINCIPIO DE LA LINEA
+		printf("\e[%iA\r", 100);
+
+		printf("+----------------------------------------------------------------------------------------------------------------------+");
 		printf("\n\n\n\n\n");
+
 		if (access("save.txt", F_OK) == 0) {
 	        printf("\n\n\t\t   MENU\n\n\t\t 1.CONTINUAR  	\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\t\t 4.GUARDAR PARTIDA\n\t\t 5.BORRAR PARTIDA\n\n\n\n");
 		} else {
 			printf("\n\n\t\t   MENU\n\n\t\t 1.JUGAR\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\n\n\n\n\n");
 		}
 
-
-
-		// printf("\ntu ch es: %c", op);
 		printf("\n\n\n                                                                                                                        ");
 		printf("\n                                                     CONTROLES                                                          ");
 		printf("\n                                                                                                                        ");
 		printf("\n                                  MOVIMIENTO:                        SELECCIONAR:                                       ");
 		printf("\n                               W                                                                                        ");
 		printf("\n                            A  S  D    /    FLECHAS                BARRA ESPACIADORA                                    ");
+		printf("\n                                                                                                                        ");
+		printf("\n                                                                                                                        ");
+		printf("\n                                                                                                                        ");
+		printf("\n+----------------------------------------------------------------------------------------------------------------------+");
 
-		// printf("\n\n\n\n                                                                                                                       A");
-		// printf("\n\n\n\n-----------------------------------------------------------------------------------------------------------------------+");
-		printf("\n\n\n\n                                                                                                                       +");
 		op = getch();
+		
 		switch(op){
 			case '1':
 				// COMENZAR A JUGAR
+				cls();
                 playGame();
 				break;
 				
@@ -54,12 +55,13 @@ int main() {
 			case '3':
 				// CERRAR EL JUEGO
 				cls();
+				printf("\e[?25h");	//VUELVE A MOSTRAR EL "CURSOR"
                 return 0;
 				break;
 
 			case '4':
 				// GUARDAR PARTIDA
-				guardarPartida(&NDL);
+				guardarPartida(&noviaDeLisa);
 				break;
 
 			case '5':

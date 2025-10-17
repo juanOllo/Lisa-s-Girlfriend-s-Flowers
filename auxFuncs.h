@@ -23,7 +23,7 @@ typedef struct {
 	int y;
 } coor;
 
-struct NoviaDeLisa {
+struct Player {
 	int HP;                 //puntos de hp de ndl
 	int cantFlores;         //cantidad de flores en mano
 	int misionesCumplidas;  //cantidad de flores entregadas
@@ -32,6 +32,43 @@ struct NoviaDeLisa {
 	coor ubi;               //ubicacion actual de ndl
 	int calleLoc;           //en que seccion del juego se encuentra ndl
 };
+
+
+// No es necesario pero las defino aca para encontrarlas mas rapido
+void matrisDebug(char matris[max][max2]);
+void cargaDeEscena(char d[max][max2], int l);
+int proximo(coor u, coor e);
+coor randomUbi(coor e, char limit[max][max2]);
+void freeze(int s);
+void leerEscuchar(int cont);
+void error(int a);
+coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
+coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
+void cinematica(int l/*line*/);
+void guardarPartida(struct Player *ndl);
+void actualizarHP(int hp);  
+void marginTop();
+void actualizarMenuVecino(int vecinoFocusOption);
+
+
+
+
+
+
+
+
+
+
+
+void marginTop(){
+	printf("\e[%iA", 100);
+
+    // Margin top
+    printf("\n\n\n\n\n");
+
+    // Altura de los frames.
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+}
 
 
 
@@ -221,7 +258,7 @@ void freeze(int s){
 
 
 
-//  PRINTEA DIALOGO DE NPC
+//  PRINTEA DIALOGO DE PERSONAJE
 void leerEscuchar(int cont){
 
     FILE *f;
@@ -262,10 +299,12 @@ void leerEscuchar(int cont){
 
 
 
-void error(char errorMsj[100]){
+// void error(char errorMsj[100]){
+void error(int a){
     FILE *errors;
 	errors = fopen("errors.txt", "a");
-	fprintf(errors, errorMsj);
+	// fprintf(errors, errorMsj);
+	fprintf(errors, "%d", a);
 	fprintf(errors, "\n");
 	fclose(errors);
 }
@@ -287,7 +326,7 @@ void error(char errorMsj[100]){
 //                 teclado        de ndl        escLimitCalle/Casa              calle = 1
 //                                                                              vecino1 = 3
 //                                                                              vecino2 = 4
-coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle) {
+coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle) {
     coor nuevaUbiAux = actualUbi;
     // isOk sirve para q no redibuje la escena si no entro un input correcto
     int isOk;
@@ -296,68 +335,6 @@ coor movimiento (char input, coor actualUbi, char movimientoLimit[max][max2], in
         isOk = 1;
 
         switch (casaOCalle){
-            case 3:
-                switch (input){
-                    case 'd':
-                    case 'D':
-                    case 'M':
-                        nuevaUbiAux.x = nuevaUbiAux.x + 2;
-                        break;
-                    // case 'a':
-                    // case 'A':
-                    // case 'K':
-                    //     nuevaUbiAux.x = nuevaUbiAux.x - 2;
-                    //     break;
-                    case 'w':
-                    case 'W':
-                    case 'H':
-                        nuevaUbiAux.y = nuevaUbiAux.y + 2;
-                        break;
-                    case 's':
-                    case 'S':
-                    case 'P':
-                        nuevaUbiAux.y = nuevaUbiAux.y - 2;
-                        break;
-                    case '.':
-                        break;
-                    default:
-                        isOk = 0;
-                        input = getch();
-                        break;
-                }
-            break;
-
-            case 4:
-                switch (input){
-                    case 'd':
-                    case 'D':
-                    case 'M':
-                        nuevaUbiAux.x = nuevaUbiAux.x + 5;
-                        break;
-                    case 'a':
-                    case 'A':
-                    case 'K':
-                        nuevaUbiAux.x = nuevaUbiAux.x - 5;
-                        break;
-                    case 'w':
-                    case 'W':
-                    case 'H':
-                        nuevaUbiAux.y = nuevaUbiAux.y + 2;
-                        break;
-                    case 's':
-                    case 'S':
-                    case 'P':
-                        nuevaUbiAux.y = nuevaUbiAux.y - 2;
-                        break;
-                    case '.':
-                        break;
-                    default:
-                        isOk = 0;
-                        input = getch();
-                        break;
-                }
-            break;
-        
             default:
                 switch (input){
                     case 'd':
@@ -432,6 +409,67 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
         input = getch();
 
         switch (casaOCalle){
+
+            case 0:
+            case 1:
+                switch (input){
+                    case 'd':
+                    case 'D':
+                    case 'M':
+                        nuevaUbiAux.x = nuevaUbiAux.x + (3 - casaOCalle);
+                        break;
+                    case 'a':
+                    case 'A':
+                    case 'K':
+                        nuevaUbiAux.x = nuevaUbiAux.x - (3 - casaOCalle);
+                        break;
+                    case 'w':
+                    case 'W':
+                    case 'H':
+                        nuevaUbiAux.y = nuevaUbiAux.y + 1;
+                        break;
+                    case 's':
+                    case 'S':
+                    case 'P':
+                        nuevaUbiAux.y = nuevaUbiAux.y - 1;
+                        break;
+                    // case '.':
+                    //     break;
+                    default:
+                        break;
+                }
+            break;
+
+            case 3:
+                switch (input){
+                    case 'd':
+                    case 'D':
+                    case 'M':
+                        nuevaUbiAux.x = nuevaUbiAux.x + 2;
+                        break;
+                    // case 'a':
+                    // case 'A':
+                    // case 'K':
+                    //     nuevaUbiAux.x = nuevaUbiAux.x - 2;
+                    //     break;
+                    case 'w':
+                    case 'W':
+                    case 'H':
+                        nuevaUbiAux.y = nuevaUbiAux.y + 2;
+                        break;
+                    case 's':
+                    case 'S':
+                    case 'P':
+                        nuevaUbiAux.y = nuevaUbiAux.y - 2;
+                        break;
+                    // case '.':
+                    //     break;
+                    default:
+                        break;
+                }
+            break;
+
+
             case 4:
                 switch (input){
                     case 'd':
@@ -465,7 +503,7 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
             break;
         }
 
-    }while (movimientoLimit[max - nuevaUbiAux.y][nuevaUbiAux.x] == '#');
+    }while (movimientoLimit[max - nuevaUbiAux.y][nuevaUbiAux.x] == '#' || proximo(nuevaUbiAux, actualUbi) == 2);
 
     return nuevaUbiAux;
 }
@@ -485,43 +523,33 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
 
 
 
-//  
+// FUNCION QUE DIBUJA UNA CINEMATICA
 void cinematica(int l/*line*/){
+
+    // Con esto oculto la barra de hp durante las cinematicas
+    printf("\n\n\t                                                                      \n");
+    printf("\e[%iA", 3);
+
+
 	FILE *f;
-    int i = 0;
-    int j = 0;
     char aux;
-    int inicio = 0;
+    int contador = 0;
     char linea[max2+1];
     
     f = fopen("cinematicas.txt", "r");
     
-    while(inicio < l){
+    while(contador < l){
         fscanf(f, "%c", &aux);
 		fscanf(f, "%c", &aux);
         fgets(linea, sizeof(linea), f);
         fscanf(f, "%c", &aux);
-        inicio++;
+        contador++;
     }
 
-	// cls();
-    printf("\e[%iA", 100);
-    
-    // printf("\n\n\n\n\n\n\n");
-    printf("                                                                                               \n");
-    printf("                                                                                               \n");
-    printf("                                                                                               \n");
-    printf("                                                                                               \n");
-    printf("                                                                                               \n");
-    printf("                                                                                               \n");
-    printf("                                                                                               \n");
-
-
-
-    // printf("\n\n\n\n\n");
+    printf("\e[%iA", 15);
     
     if(f != NULL){
-        for (i=1; i<=max*2-2; i++){
+        for (contador = 1; contador <= max*2-2; contador++){
 			// printf("                            ");
 			printf("                              ");
 			fscanf(f, "%c", &aux);
@@ -534,128 +562,8 @@ void cinematica(int l/*line*/){
     }
 
 	fclose(f);
-
-    // printf("                                                                                               \n");
-    // printf("                                                                                               \n");
-    // printf("                                                                                               \n");
-    // printf("                                                                                               \n");
-    // printf("                                                                                               \n");
-    // printf("                                                                                               \n");
-    // printf("                                                                                               \n");
 }
 
-// void cinematica2(int l/*line*/){
-// 	FILE *f;
-//     int i = 0;
-//     int j = 0;
-//     char aux;
-//     int inicio = 0;
-//     char linea[max2+1];
-    
-//     f = fopen("cinematicas.txt", "r");
-    
-//     while(inicio < l){
-//         fscanf(f, "%c", &aux);
-// 		fscanf(f, "%c", &aux);
-//         fgets(linea, sizeof(linea), f);
-//         fscanf(f, "%c", &aux);
-//         inicio++;
-//     }
-
-// 	cls();
-//     printf("\n\n\n\n\n\n\n");
-    
-//     if(f != NULL){
-// 			fscanf(f, "%c", &aux);
-//             fgets(linea, sizeof(linea), f);
-// 			printf("                            ");
-// 			printf("%s", linea);
-
-
-//         for (i=1; i<=(max/2)-1; i++){
-//             fscanf(f, "%c", &aux);
-//             fscanf(f, "%c", &aux);
-//             fscanf(f, "%c", &aux);
-//             fgets(linea, sizeof(linea), f);
-// 			// printf("\n%s", linea);
-// 			printf("\n");
-
-//             fscanf(f, "%c", &aux);
-//             fscanf(f, "%c", &aux);
-//             fscanf(f, "%c", &aux);
-//             fgets(linea, sizeof(linea), f);
-// 			printf("\n                            ");
-// 			printf("%s", linea);
-
-//         }
-//         printf("\n");
-//     }
-//     else{
-//         printf("error");
-//     }
-
-// 	fclose(f);
-// }
-
-// void cinematica3(int l/*line*/){
-// 	FILE *f;
-//     int i = 0;
-//     int j = 0;
-//     char aux;
-//     int inicio = 0;
-//     char linea[max2+1];
-    
-//     f = fopen("cinematicas.txt", "r");
-    
-//     while(inicio < l){
-//         fscanf(f, "%c", &aux);
-// 		fscanf(f, "%c", &aux);
-//         fgets(linea, sizeof(linea), f);
-//         fscanf(f, "%c", &aux);
-//         inicio++;
-//     }
-
-// 	cls();
-//     printf("\n\n\n\n\n\n\n");
-    
-//     if(f != NULL){
-// 			fscanf(f, "%c", &aux);
-//             fgets(linea, sizeof(linea), f);
-// 			printf("                            ");
-// 			printf("");
-
-
-//         for (i=1; i<=(max/3)-1; i++){
-
-//             fscanf(f, "%c", &aux);
-//             fscanf(f, "%c", &aux);
-//             fscanf(f, "%c", &aux);
-//             fgets(linea, sizeof(linea), f);
-// 			// printf("\n%s", linea);
-// 			printf("\n");
-            
-//             fscanf(f, "%c", &aux);
-//             fscanf(f, "%c", &aux);
-//             fscanf(f, "%c", &aux);
-//             fgets(linea, sizeof(linea), f);
-// 			printf("\n                            ");
-// 			printf("%s", linea);
-
-//             fscanf(f, "%c", &aux);
-//             fscanf(f, "%c", &aux);
-//             fscanf(f, "%c", &aux);
-//             fgets(linea, sizeof(linea), f);
-// 			// printf("\n%s", linea);
-// 			printf("\n");
-
-//         }
-//     }
-//     else{
-//         printf("error");
-//     }
-
-// 	fclose(f);
-// }
 
 
 
@@ -671,9 +579,8 @@ void cinematica(int l/*line*/){
 
 
 
-
-
-void guardarPartida(struct NoviaDeLisa *ndl){
+// Guarda TODOS LOS DATOS DE NDL EN save.txt
+void guardarPartida(struct Player *ndl){
 
     char toSaveArray[16];
 
@@ -737,37 +644,75 @@ void guardarPartida(struct NoviaDeLisa *ndl){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 void actualizarHP(int hp){
-
-    printf("\e[%iA", 100);
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-
+    
+    printf("\n\n\t                                      ");
     switch (hp){
         case 100:
-            printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++++] \n");
+            // printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++++] \n");
+            printf(" ENERGIA SOCIAL: [////////] \n");
             break;
         case 75:
-            printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++__] \n");
+            printf(" ENERGIA SOCIAL: [//////--] \n");
             break;
         case 50:
-            printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++____] \n");
+            printf(" ENERGIA SOCIAL: [////----] \n");
             break;
         case 25:
-            printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++______] \n");
+            printf(" ENERGIA SOCIAL: [//------] \n");
             break;
         case 0:
-            printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [________] \n");
+            printf(" ENERGIA SOCIAL: [--------] \n");
             break;
         default:
             break;
     }
-    printf("                                                                                                                       ");
-    printf("\n                                                                                                                       ");
-    printf("\n                                                                                                                       ");
-    printf("\n                                                                                                                       ");
-    printf("\n                                                                                                                       ");
-    // printf("\n                                                                                                                       ");
-    // printf("\n                                                                                                                        ");
 
-    printf("\e[%iA", 100);
+    printf("\e[%iA", 3);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void actualizarMenuVecino(int vecinoFocusOption){
+    switch (vecinoFocusOption){
+        case 1:
+            printf("\t\t\t\t      _          .n.  _                |     |    \n");
+            printf("\t\t\t\t     |          C O D  |               |  |  |    \n");
+            printf("\t\t\t\t     | Dar Flor  *Y*   |       Volver  |     |    \n");
+            printf("\t\t\t\t     |_           |   _|               |  |  |    \n");
+            break;
+
+        case 2:
+            printf("\t\t\t\t                 .n.          _        |     | _  \n");
+			printf("\t\t\t\t                C O D        |         |  |  |  |  \n");
+			printf("\t\t\t\t       Dar Flor  *Y*         | Volver  |     |  |  \n");
+			printf("\t\t\t\t                  |          |_        |  |  | _|  \n");
+            break;
+        
+        default:
+            break;
+    }
+    printf("\e[%iA", 4);
 }
