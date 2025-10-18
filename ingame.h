@@ -209,6 +209,7 @@ int menuDeCasa(){
 
     char casaInput = 'x';
     
+	// Ya no lo necesito pero lo guardo por las dudas.
     //system ("/bin/stty raw"); //FUNCIONA PARA Q GETCHAR() FUNCIONE EN UBUNTU
     
 	actualizarHP(noviaDeLisa.HP);
@@ -222,19 +223,19 @@ int menuDeCasa(){
         
         switch(estadoEnCasa){
             case 0:
-                casaInput = getch();
+                // casaInput = getch();
 				// noviaDeLisa.ubi = movimiento2(noviaDeLisa.ubi, escCasaLimit, 0);
                 break;
 
-			// SALIO A LA CALLE POR LA PUERTA
+			// SALIO A LA CALLE POR LA PUERTA.
             case 1:
 
-				// ESTE IF NO TE DEJA SALIR DE CASA CON 0 DE ENERGIA
+				// ESTE IF NO TE DEJA SALIR DE CASA CON 0 DE ENERGIA.
 				if(noviaDeLisa.HP == 0) {
 					noviaDeLisa.ubi.x = noviaDeLisa.ubi.x - 6;
+
 				} else {
-					noviaDeLisa.ubi.x = 11;
-					noviaDeLisa.ubi.y = 6;
+					noviaDeLisa.ubi = (coor){11, 6};
 					noviaDeLisa.calleLoc = 1;
 					cargaDeEscena(escCalle, 1);
 					cargaDeEscena(escCalleLimit, 18);
@@ -242,9 +243,53 @@ int menuDeCasa(){
 				}
                 break;
 				
+			// AGARRASTE UNA FLOR.
+			case 2:
+				noviaDeLisa.cantFlores = 1;
+				
+				// if (noviaDeLisa.misionesCumplidas < 3){
+					cinematica(494, 700);
+					cinematica(511, 1000);
+				// } else {
+				// 	cinematica(562);
+				// 	freeze(1);
+				// 	cinematica(579);
+				// 	freeze(1);
+				// }
+
+				estadoEnCasa = dibujarEscena(escCasa, 1);
+				actualizarHP(noviaDeLisa.HP);
+				break;
+
+			// AGARRASTE UN CARAMELO.
+			case 3:
+				// noviaDeLisa.HP = 100;
+
+				// if (noviaDeLisa.misionesCumplidas < 3){
+					cinematica(698, 800);
+					cinematica(715, 500);
+					cinematica(732, 500);
+				// } else {
+				// 	cinematica(596);	//tengo q poner la mano con la venda aca
+				// 	freeze(1);
+				// 	cinematica(562);	//y aca
+				// 	freeze(1);
+				// }
+
+				actualizarHP(noviaDeLisa.HP);
+				freeze_ms(900);
+				noviaDeLisa.HP = 100;
+				actualizarHP(noviaDeLisa.HP);
+				freeze_ms(500);
+
+				estadoEnCasa = dibujarEscena(escCasa, 1);
+				break;
+
             default:
                 break;
         }
+
+		casaInput = getch();
         
 		// MOVIMIENTO DE noviaDeLisa
 		noviaDeLisa.ubi = movimientoConInput(casaInput, noviaDeLisa.ubi, escCasaLimit, 0);
@@ -328,8 +373,7 @@ int menuDeCalle (){
 
 			// TE ATRAPARON LAS ABEJAS, VOLVES A CASA
 		    case 2:
-				cinematica(18);
-				freeze(3);
+				cinematica(18, 3000);
 
 				noviaDeLisa.cantFlores = 0;
 				noviaDeLisa.ubi = (coor){31, 6};
@@ -342,7 +386,7 @@ int menuDeCalle (){
 		        if(noviaDeLisa.calleLoc-1 > noviaDeLisa.misionesCumplidas){
 		            //cls();
 		            printf("\n\tAVISO: Debes entregas la flor anterior.\n");
-					freeze(2);
+					freeze_ms(2000);
 					printf("\e[%iA", 1);
 		            printf("\t                                         \n");
 
@@ -409,9 +453,9 @@ int menuDeVecino(){
 
 	// PRIMERA ESCENA EN VECINO, CON O SIN FLOR
 	if(noviaDeLisa.cantFlores < 1){
-		cinematica(35 + ((17*5) * auxMisionesCumplidas));	//dibujo(casaDeVecino, 3);	
+		cinematica(35 + ((17*5) * auxMisionesCumplidas), 0);	//dibujo(casaDeVecino, 3);	
 	}else{
-		cinematica(52 + ((17*5) * auxMisionesCumplidas));
+		cinematica(52 + ((17*5) * auxMisionesCumplidas), 0);
 	}
 
 	actualizarMenuVecino(1);
@@ -461,9 +505,9 @@ int menuDeVecino(){
 
 								// PRIMERA ESCENA EN VECINO, CON O SIN FLOR
 								if(noviaDeLisa.cantFlores < 1){
-									cinematica(35 + ((17*5) * auxMisionesCumplidas));	//dibujo(casaDeVecino, 3);	
+									cinematica(35 + ((17*5) * auxMisionesCumplidas), 0);	//dibujo(casaDeVecino, 3);	
 								}else{
-									cinematica(52 + ((17*5) * auxMisionesCumplidas));
+									cinematica(52 + ((17*5) * auxMisionesCumplidas), 0);
 								}
 
 								actualizarMenuVecino(1);
@@ -479,10 +523,10 @@ int menuDeVecino(){
 								if (vecinoContadorDeEscuchas == 4){
 									noviaDeLisa.lucides[noviaDeLisa.misionesCumplidas] = 1;
 
-									cinematica(52 + ((17*5) * (auxMisionesCumplidas-1)));
+									cinematica(52 + ((17*5) * (auxMisionesCumplidas-1)), 3000);
 									printf("\n\n");
 									leerEscuchar(contador);
-									freeze(3);
+									// freeze(3);
 								}
 
 								noviaDeLisa.misionesCumplidas++;
@@ -499,8 +543,7 @@ int menuDeVecino(){
 								noviaDeLisa.misionesCumplidas++;
 								noviaDeLisa.cantFlores = 0;
 
-								cinematica(103);
-								freeze(2);
+								cinematica(103, 2000);
 
 								// Uso cls() porq asi es mas facil borrar el hud del vecino cuando volves a la casa.
 								cls();
@@ -708,8 +751,7 @@ int vecinoGameplay(){
 						
 						// SI ENTREGASTE LAS 3 FLORES EL MINIJUEGO TERMINA
 						if ((los3Vecinos[0] + los3Vecinos[1] + los3Vecinos[2]) == 3){
-							cinematica(188);
-							freeze(2);
+							cinematica(188, 2000);
 							return 3;
 						}
 
@@ -769,56 +811,7 @@ int dibujarEscena(char d[max][max2], int loc){
 
     switch(loc){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-        case 1:											//DIBUJA LA ESCENA DE LA CASA
-
-			// 		ESTOS IF CHEKEAN SI HACES CONTACTO CON ALGO
-
-			// AGARRASTE UNA FLOR
-            if(proximo(noviaDeLisa.ubi, flor) == 1 && noviaDeLisa.cantFlores == 0){
-				noviaDeLisa.cantFlores = 1;
-				
-				printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-				
-				// if (noviaDeLisa.misionesCumplidas < 3){
-					cinematica(494);
-					freeze(1);
-					cinematica(511);
-					freeze(1);
-				// } else {
-				// 	cinematica(562);
-				// 	freeze(1);
-				// 	cinematica(579);
-				// 	freeze(1);
-				// }
-
-				actualizarHP(noviaDeLisa.HP);
- 
-				// marginTop();
-				printf("\e[%iA", 15);
-            }
-
-			// COMISTE LOS CARAMELOS
-            if(proximo(noviaDeLisa.ubi, curas) == 1 && noviaDeLisa.HP < 100){
-				noviaDeLisa.HP = 100;
-
-				printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-
-				// if (noviaDeLisa.misionesCumplidas < 3){
-					cinematica(596);
-					freeze(1);
-					cinematica(375);
-					freeze(1);
-				// } else {
-				// 	cinematica(596);	//tengo q poner la mano con la venda aca
-				// 	freeze(1);
-				// 	cinematica(562);	//y aca
-				// 	freeze(1);
-				// }
-								
-				actualizarHP(noviaDeLisa.HP);
-
-				printf("\e[%iA", 15);
-            }
+        case 1:		
 
 			// 		ESTE FOR SOLO DIBUJA LA ESCENA
             for(int i = max-1; i > 0; i--){
@@ -847,12 +840,20 @@ int dibujarEscena(char d[max][max2], int loc){
                 printf("\n");
             }
 
-			//  (algunos if es mejor ponerlos desp de dibujar la escena)
 			// 		ESTOS IF CHEKEAN SI HACES CONTACTO CON ALGO
+			//  (algunos if es mejor ponerlos desp de dibujar la escena)
+
 			// SALISTE A LA CALLE POR LA PUERTA
-			if(proximo(noviaDeLisa.ubi, puertaACalle) == 1){
+			if(proximo(noviaDeLisa.ubi, puertaACalle) == 1)
 				return 1;
-            }
+
+			// AGARRASTE UNA FLOR
+			if(proximo(noviaDeLisa.ubi, flor) == 1 && noviaDeLisa.cantFlores == 0)
+				return 2;
+
+			// COMISTE LOS CARAMELOS
+            if(proximo(noviaDeLisa.ubi, curas) == 1 && noviaDeLisa.HP < 100)
+				return 3;
 
             break;
 
@@ -908,17 +909,18 @@ int dibujarEscena(char d[max][max2], int loc){
 
 			// 		ESTOS IF CHEKEAN SI HACES CONTACTO CON ALGO
 			// ENTRAR A CASA
-            if(noviaDeLisa.calleLoc==1 && proximo(noviaDeLisa.ubi, entyCoor[10])==2){	return 1;	}
-
-			// ENTRAR A VECINO 1, 2, 3 o 4
-			if(proximo(noviaDeLisa.ubi, entyCoor[10 + noviaDeLisa.calleLoc]) == 2){		return 3;	}
+            if(noviaDeLisa.calleLoc==1 && proximo(noviaDeLisa.ubi, entyCoor[10])==2)
+				return 1;
 
 			// ATRAPADA POR ABEJA
 				// habria que averiguar si ya con checkear el (noviaDeLisa.calleLoc == noviaDeLisa.misionesCumplidas) == false
 				// 		salta de linea o hace todos los checkeos del if, por temas de rendimiento
-            if(((noviaDeLisa.calleLoc == noviaDeLisa.misionesCumplidas)) && (noviaDeLisa.cantFlores > 0 && noviaDeLisa.misionesCumplidas > 0) && ((proximo(noviaDeLisa.ubi, entyCoor[1]) > 0) || (proximo(noviaDeLisa.ubi, entyCoor[2]) > 0) || (proximo(noviaDeLisa.ubi, entyCoor[3]) > 0))){
-                return 2;
-            }
+            if((noviaDeLisa.calleLoc == noviaDeLisa.misionesCumplidas) && (noviaDeLisa.cantFlores > 0 && noviaDeLisa.misionesCumplidas > 0) && ((proximo(noviaDeLisa.ubi, entyCoor[1]) > 0) || (proximo(noviaDeLisa.ubi, entyCoor[2]) > 0) || (proximo(noviaDeLisa.ubi, entyCoor[3]) > 0)))
+                return 2;	
+
+			// ENTRAR A VECINO 1, 2, 3 o 4
+			if(proximo(noviaDeLisa.ubi, entyCoor[10 + noviaDeLisa.calleLoc]) == 2)
+				return 3;	
 
             break;
 		
@@ -967,7 +969,7 @@ int dibujarEscena(char d[max][max2], int loc){
 				// checkea si hiciste contacto con un obstaculo
 				if (proximo(noviaDeLisa.ubi, obstaculos[m]) > 0){
 					noviaDeLisa.HP = noviaDeLisa.HP - 25;
-					freeze(1);
+					freeze_ms(1000);
 					// si perdiste todo el hp volves a casa y alguien entrego la flor por vos
 					if(noviaDeLisa.HP == 0){	return 2;	}
 					// sino sale del minijuego pero seguis en el vecino
@@ -1032,7 +1034,7 @@ int dibujarEscena(char d[max][max2], int loc){
 			for (int b = 0; b < 6; b++){
 				if (proximo(noviaDeLisa.ubi, balones[b]) > 0){
 					noviaDeLisa.HP = noviaDeLisa.HP - 25;
-					freeze(1);
+					freeze_ms(1000);
 					// si perdiste todo el hp volves a casa y alguien entrego la flor por vos
 					if(noviaDeLisa.HP == 0){	return 2;	}
 					// sino sale del minijuego pero seguis en el vecino
