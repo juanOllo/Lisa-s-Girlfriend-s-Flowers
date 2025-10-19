@@ -13,8 +13,8 @@
 #include "auxLibsWin.h"
 // #include "auxLibsUbu.h"
 
-// #include <pthread.h>
-// #include <stdbool.h>
+#include <pthread.h>
+#include <stdbool.h>
 
 #define max 16
 #define max2 60
@@ -56,12 +56,18 @@ coor randomUbi(coor e, char limit[max][max2]);
 
 
 // Esta funcion esta arriba siempre porq la uso solo para debuggear y suelo cambiar el perfil y parametros.
-void error(char errorMsj[100]){
-// void error(int a){
+void error1(char errorMsj[100]){
     FILE *errors;
 	errors = fopen("errors.txt", "a");
 	fprintf(errors, errorMsj);
-	// fprintf(errors, "%d", a);
+	fprintf(errors, "\n");
+	fclose(errors);
+}
+
+void error2(int a){
+    FILE *errors;
+	errors = fopen("errors.txt", "a");
+	fprintf(errors, "%d", a);
 	fprintf(errors, "\n");
 	fclose(errors);
 }
@@ -556,8 +562,11 @@ int proximo(coor u, coor e){
     if(e.x==u.x && e.y==u.y)
         return 2; //Están en el mismo lugar 
 
-    if((e.x+4>u.x && u.x>e.x-2) && (e.y+2>u.y && u.y>e.y-2))
-        return 1; //U está en el area de e pero no en el mismo lugar
+    // if((e.x+4>u.x && u.x>e.x-2) && (e.y+2>u.y && u.y>e.y-2))
+    //     return 1; //U está en el area de e
+
+    if((e.x+2>u.x && u.x>e.x-2) && (e.y+2>u.y && u.y>e.y-2))
+        return 1; //U está en el area de e
 
     return 0; //No están ni cerca
 }

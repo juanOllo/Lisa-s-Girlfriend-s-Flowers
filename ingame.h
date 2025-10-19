@@ -37,9 +37,16 @@ char saveArray[16];
 
 // Obstaculos del juego de 1er vecino
 coor obstaculos[5];
+int velocidadObstaculos = 300;
+
 // Balones del juego de 2do vecino
 coor balones[6];
+int velocidadBalones = 200;
 
+float fps = 20; //frames por segundo
+float fpsDibujo; 
+int impactoConEntidad = 0;
+volatile bool seguirDibujando = true;
 
 
 
@@ -61,6 +68,8 @@ coor balones[6];
 
 // ESTA FUNCION TE VA A MOVER ENTRE DIFERENTES MENUS JUGABLES (CASA, CALLE, CASA DE VECINO)
 void playGame() {
+
+	fpsDibujo = 1000 / fps; //milisegundos entre cada frame de dibujo
 
 	///////////////////CARGA DE ESCENA DE LA CASA////////////
     /**/ cargaDeEscena(escCasa, 1);
@@ -126,7 +135,7 @@ void playGame() {
 	/////////////////INICIALISACION DE ENTIDADES/////////////////////
 	/**/ flor = (coor){46, 10};
 	/**/ puertaACalle = (coor){56, 6};
-	/**/ curas = (coor){23, 4};
+	/**/ curas = (coor){24, 4};
 	/**/
 	/**/ entyCoor[1] = (coor){30, 7};		//abeja 1
 	/**/ entyCoor[2] = (coor){18, 10};		//abeja 2
@@ -267,8 +276,9 @@ int menuDeCasa(){
 
 				// if (noviaDeLisa.misionesCumplidas < 3){
 					cinematica(698, 800);
-					cinematica(715, 500);
-					cinematica(732, 500);
+					cinematica(715, 400);
+					cinematica(732, 400);
+					cinematica(494, 200);
 				// } else {
 				// 	cinematica(596);	//tengo q poner la mano con la venda aca
 				// 	freeze(1);
@@ -277,7 +287,7 @@ int menuDeCasa(){
 				// }
 
 				actualizarHP(noviaDeLisa.HP);
-				freeze_ms(900);
+				freeze_ms(700);
 				noviaDeLisa.HP = 100;
 				actualizarHP(noviaDeLisa.HP);
 				freeze_ms(500);
@@ -606,11 +616,114 @@ int menuDeVecino(){
 
 
 
+
+void* threadDibujo(void* arg) {
+	int loc = *(int*)arg; // Convertir el argumento genérico a int
+	// error1("loc: ");
+	// error2(loc);
+    while (seguirDibujando) {
+        dibujarEscena(escVecino, loc);
+		// error2(impactoConEntidad);
+
+		// Asi entonces el thread se detiene antes de recibir el ultimo input.
+		// Solo se detiene haciendo impacto con un "enemigo".
+		if (impactoConEntidad == 1)
+			pthread_exit(NULL);
+
+        // usleep(100); // 100ms entre frames (ajustable)
+		freeze_ms(fpsDibujo);
+    }
+    return NULL;
+}
+
+void* threadActualizarUbisDeObstaculos(void* arg) {
+    while (seguirDibujando) {
+		for (int m = 0; m < 5; m++){
+			// todos los obstaculos se mueven 4 a la izq
+			obstaculos[m].x = obstaculos[m].x - 4;
+
+			// el obstaculo q se pasa d largo del mapa reinicia ubi
+			if(obstaculos[m].x < 10)
+				obstaculos[m] = (coor){56, noviaDeLisa.ubi.y};
+
+		}
+		freeze_ms(velocidadObstaculos);
+    }
+    return NULL;
+}
+
+void* threadActualizarUbisDeBalones(void* arg) {
+    while (seguirDibujando) {
+
+		// PRIMERO CHECKEA SI TE IMPACTA UN BALON
+		// 	SINO ACTUALIZA LA UBI DEL BALON EN EL switch DE ABAJO
+		for (int b = 0; b < 6; b++){
+
+			// TODOS LOS if RESTARTEAN LA UBI DE LOS BALONES SI SE PASAN DE LARGO
+			// 	SINO SOLO SE MUEVEN
+			switch (b){
+				case 0:
+				case 5:
+					if(balones[b].y < 4){
+						balones[b].y = 14;
+						balones[b].x = noviaDeLisa.ubi.x;
+					} else{
+						balones[b].y = balones[b].y - 1;
+					}
+					break;
+
+				case 1:
+				case 3:
+					if(balones[b].x > 40){
+						balones[b].x = 10;
+						balones[b].y = noviaDeLisa.ubi.y;
+					} else{
+						balones[b].x = balones[b].x + 2;
+					}
+					break;
+
+				case 2:
+				case 4:
+					if(balones[b].x < 20){
+						balones[b].x = 50;
+						balones[b].y = noviaDeLisa.ubi.y;
+					} else{
+						balones[b].x = balones[b].x - 2;
+					}
+					break;
+				
+				default:
+					break;
+			}
+			
+		}
+		freeze_ms(velocidadBalones);
+    }
+
+    return NULL;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int vecinoGameplay(){
 
 	coor auxUbi = noviaDeLisa.ubi;
 	int x = 1;
 	char input;
+	impactoConEntidad = 0;
 
 	// marginTop();
 
@@ -619,160 +732,191 @@ int vecinoGameplay(){
 			cargaDeEscena(escVecino, 171);
 			cargaDeEscena(escVecinoLimit, 188);
 
-			// do{
-				noviaDeLisa.ubi = (coor){10, 7};
+			noviaDeLisa.ubi = (coor){10, 7};
+			actualizarHP(noviaDeLisa.HP);
 
-				x = dibujarEscena(escVecino, 3);
+			for (int i = 0; i < 5; i++) {
+				obstaculos[i].x = 32 + (i*9);
+				obstaculos[i].y = 11 - (i*2);
+			}
 
-				actualizarHP(noviaDeLisa.HP);
+			// INICIA EL MINIJUEGO DE LOS OBSTACULOS
+			seguirDibujando = true;
 
-				// INICIALIZA LOS OBSTACULOS CADA VEZ Q EMPEZAS EL MINIJUEGO
-				for (int i = 0; i < 5; i++)	{
-					obstaculos[i].x = 32 + (i*8);
-					obstaculos[i].y = 11 - (i*2);
-				}
+			// Lanzar el thread de dibujo
+			pthread_t hiloDibujo;
+			int loc3 = 3;
+			pthread_create(&hiloDibujo, NULL, threadDibujo, &loc3);
 
-				do{
-					noviaDeLisa.ubi = movimiento2(noviaDeLisa.ubi, escVecinoLimit, 3);
-					x = dibujarEscena(escVecino, 3);
+			// Lanzar el thread de actualizacion de ubis
+			pthread_t hiloEntidades;
+			pthread_create(&hiloEntidades, NULL, threadActualizarUbisDeObstaculos, NULL);
 
-				} while (input != '.' && x == 0);
+			char input = 0;
+			while (input != '.' && impactoConEntidad == 0){
+				noviaDeLisa.ubi = movimiento2(noviaDeLisa.ubi, escVecinoLimit, 3);
+				// freeze_ms(100); // Pequeña pausa para evitar que el thread de dibujo consuma demasiados recursos
+				// x = dibujarEscena(escVecino, 3); // opcional si querés forzar un frame tras el movimiento
+			}
 
-			// }while(x == 1);
-			
+			// Detener el thread de dibujo
+			seguirDibujando = false;
+			pthread_join(hiloDibujo, NULL);
+			pthread_join(hiloEntidades, NULL);
+
 			noviaDeLisa.ubi = auxUbi;
-
-			return x;
+			return impactoConEntidad;
 			break;
 		
 		case 1:
 			cargaDeEscena(escVecino, 205);
 			cargaDeEscena(escVecinoLimit, 222);
 
-			// do{
-				noviaDeLisa.ubi = (coor){30, 4};
+			noviaDeLisa.ubi = (coor){30, 4};
 
-				// PARA OCULTAR LOS BALONES CUANDO REINICIAR EL MINIJUEGO DESP DE UN IMPACTO
-				for (int b = 1; b < 6; b++){
-					balones[b].x = 100;
-					balones[b].y = 100;
-				}
-				
-				balones[0] = (coor){30, 12};
+			// PARA OCULTAR LOS BALONES CUANDO REINICIAR EL MINIJUEGO DESP DE UN IMPACTO
+			for (int b = 1; b < 6; b++){
+				balones[b].x = 100;
+				balones[b].y = 100;
+			}
+			
+			
+			// x = dibujarEscena(escVecino, 4);
+			
+			// actualizarHP(noviaDeLisa.HP);
+			
+			balones[0] = (coor){30, 12};
+			balones[5] = (coor){30, 18};
+			balones[1] = (coor){15, noviaDeLisa.ubi.y};
+			balones[2] = (coor){50, noviaDeLisa.ubi.y};
+			balones[3] = (coor){-5, noviaDeLisa.ubi.y + 2};
+			balones[4] = (coor){70, noviaDeLisa.ubi.y + 2};
 
-				x = dibujarEscena(escVecino, 4);
+			// ARREGLO CON LOS VECINO
+			int los3Vecinos[3];
+			for (int v = 0; v < 3; v++){
+				los3Vecinos[v] = 0;
+			}
 
-				actualizarHP(noviaDeLisa.HP);
+			// INICIA EL MINIJUEGO DE LOS BALONES
+			seguirDibujando = true;
 
-				balones[5] = (coor){30, 16};
-				balones[1] = (coor){15, noviaDeLisa.ubi.y};
-				balones[2] = (coor){50, noviaDeLisa.ubi.y};
-				balones[3] = (coor){-5, noviaDeLisa.ubi.y + 2};
-				balones[4] = (coor){70, noviaDeLisa.ubi.y + 2};
+			// Lanzar el thread de dibujo
+			pthread_t hiloDibujo2;
+			int loc = 4;
+			pthread_create(&hiloDibujo2, NULL, threadDibujo, &loc);
 
-				// ARREGLO CON LOS VECINO
-				int los3Vecinos[3];
-				for (int v = 0; v < 3; v++){
-					los3Vecinos[v] = 0;
-				}
+			// Lanzar el thread de actualizacion de ubis
+			pthread_t hiloEntidades2;
+			pthread_create(&hiloEntidades2, NULL, threadActualizarUbisDeBalones, NULL);
 
-				do{
+			while (impactoConEntidad == 0 || impactoConEntidad == 3){
+				// if (impactoConEntidad == 0){
 					noviaDeLisa.ubi = movimiento2(noviaDeLisa.ubi, escVecinoLimit, 4);
-					x = dibujarEscena(escVecino, 4);
-
-					// x=3 SIGNIFICA QUE ENTREGASTE UNA FLOR
-					if (x == 3){
+				// } else {
+				// 	impactoConEntidad = 0;
+				// }
+				
+				
+				// CHECKEA SI LLEGASTE A ALGUN VECINO
+				if (noviaDeLisa.ubi.y == 12 || noviaDeLisa.ubi.x == 10 || noviaDeLisa.ubi.x == 50){
+					// impactoConEntidad = 3;
 
 						// CHECKEA A QUE VECINO LE ENTREGASTE LA FLOR
-						switch (noviaDeLisa.ubi.x){
-							case 30:
-								los3Vecinos[0] = 1;
-								escVecino[2][30] = ' ';
-								escVecino[2][31] = ' ';
+					switch (noviaDeLisa.ubi.x){
+						case 30:
+							noviaDeLisa.ubi.y = 10;
 
-								memcpy(&escVecino[3][29], "     ", 5);
-								// escVecino[3][29] = ' ';
-								// escVecino[3][30] = ' ';
-								// escVecino[3][31] = ' ';
-								// escVecino[3][32] = ' ';
-								// escVecino[3][33] = ' ';
+							// los3Vecinos[0] = 1;
+							escVecino[2][30] = ' ';
+							escVecino[2][31] = ' ';
 
-								escVecino[4][30] = ' ';
-								escVecino[4][31] = ' ';
+							// memcpy(&escVecino[3][29], "     ", 5);
+							escVecino[3][29] = ' ';
+							escVecino[3][30] = ' ';
+							escVecino[3][31] = ' ';
+							escVecino[3][32] = ' ';
+							escVecino[3][33] = ' ';
 
-								escVecinoLimit[4][30] = '#';
+							escVecino[4][30] = ' ';
+							escVecino[4][31] = ' ';
 
-								noviaDeLisa.ubi.y = 10;
-								// x = dibujarEscena(escVecino, 4);
-								break;
+							escVecinoLimit[4][30] = '#';
 
-							case 10:
-								los3Vecinos[1] = 1;
-								escVecino[9][7] = ' ';
-								escVecino[9][8] = ' ';
-								
-								escVecino[10][6] = ' ';
-								escVecino[10][7] = ' ';
-								escVecino[10][8] = ' ';
-								escVecino[10][9] = ' ';
+							// movimientoConInput('s', noviaDeLisa.ubi, escVecinoLimit, 4);
+							// movimientoConInput('s', noviaDeLisa.ubi, escVecinoLimit, 4);
+							break;
 
-								escVecino[11][7] = ' ';
-								escVecino[11][8] = ' ';
-
-								escVecinoLimit[10][10] = '#';
-
-								noviaDeLisa.ubi.x = 15;
-								// x = dibujarEscena(escVecino, 4);
-								break;
-
-							case 50:
-								los3Vecinos[2] = 1;
-								escVecino[9][53] = ' ';
-								escVecino[9][54] = ' ';
-																
-								escVecino[10][51] = ' ';
-								escVecino[10][52] = ' ';
-								escVecino[10][53] = ' ';
-								escVecino[10][54] = ' ';
-								escVecino[10][55] = ' ';
-
-								escVecino[11][53] = ' ';
-								escVecino[11][54] = ' ';
-
-								escVecinoLimit[10][50] = '#';
-
-								noviaDeLisa.ubi.x = 45;
-								// x = dibujarEscena(escVecino, 4);
-								break;
+						case 10:
+							noviaDeLisa.ubi.x = 15;
+							// los3Vecinos[1] = 1;
+							escVecino[9][7] = ' ';
+							escVecino[9][8] = ' ';
 							
-							default:
-								break;
-						}						
+							escVecino[10][6] = ' ';
+							escVecino[10][7] = ' ';
+							escVecino[10][8] = ' ';
+							escVecino[10][9] = ' ';
+
+							escVecino[11][7] = ' ';
+							escVecino[11][8] = ' ';
+
+							escVecinoLimit[10][10] = '#';
+
+							// movimientoConInput('d', noviaDeLisa.ubi, escVecinoLimit, 4);
+							error1("izquierda");
+							break;
+
+						case 50:
+							noviaDeLisa.ubi.x = 45;
+
+							// los3Vecinos[2] = 1;
+							escVecino[9][53] = ' ';
+							escVecino[9][54] = ' ';
+															
+							escVecino[10][51] = ' ';
+							escVecino[10][52] = ' ';
+							escVecino[10][53] = ' ';
+							escVecino[10][54] = ' ';
+							escVecino[10][55] = ' ';
+
+							escVecino[11][53] = ' ';
+							escVecino[11][54] = ' ';
+
+							escVecinoLimit[10][50] = '#';
+
+							break;
 						
-						// SI ENTREGASTE LAS 3 FLORES EL MINIJUEGO TERMINA
-						if ((los3Vecinos[0] + los3Vecinos[1] + los3Vecinos[2]) == 3){
-							cinematica(188, 2000);
-							return 3;
-						}
+						default:
+							break;
+					}						
+						
+					// SI ENTREGASTE LAS 3 FLORES EL MINIJUEGO TERMINA
+					// if ((los3Vecinos[0] + los3Vecinos[1] + los3Vecinos[2]) == 3){
+					// 	cinematica(188, 2000);
+					// 	return 3;
+					// }
 
-						// POR SI QUIERO QUE NO SE MUEVAN LOS BALONES JUSTO DESP DE ENTREGAR UNA FLOR
-						// 	PERO ESO HARIA MUY FACIL EL MINIJUEGO
-						// balones[0].y = balones[0].y + 2;
-						// balones[5].y = balones[5].y + 2;
-						// balones[1].x = balones[1].x - 5;
-						// balones[3].x = balones[3].x - 5;
-						// balones[2].x = balones[2].x + 5;
-						// balones[4].x = balones[4].x + 5;
+					// POR SI QUIERO QUE NO SE MUEVAN LOS BALONES JUSTO DESP DE ENTREGAR UNA FLOR
+					// 	PERO ESO HARIA MUY FACIL EL MINIJUEGO
+					// balones[0].y = balones[0].y + 2;
+					// balones[5].y = balones[5].y + 2;
+					// balones[1].x = balones[1].x - 5;
+					// balones[3].x = balones[3].x - 5;
+					// balones[2].x = balones[2].x + 5;
+					// balones[4].x = balones[4].x + 5;
 
-
-						x = dibujarEscena(escVecino, 4);
-					}
-					
-
-				} while (input != '.' && x == 0);
-
-			// }while(x == 1);
+					// x = dibujarEscena(escVecino, 4);
+				}
 			
+				// x = dibujarEscena(escVecino, 4);
+			}				
+
+			// Detener el thread de dibujo
+			seguirDibujando = false;
+			pthread_join(hiloDibujo2, NULL);
+			pthread_join(hiloEntidades2, NULL);
+
 			noviaDeLisa.ubi = auxUbi;
 
 			return x;
@@ -932,21 +1076,26 @@ int dibujarEscena(char d[max][max2], int loc){
                 printf("                              ");
                 for(int j = 1; j < max2; j++){
 
-					if((j == obstaculos[0].x-1) && (i == obstaculos[0].y)
+					if((j == obstaculos[0].x) && (i == obstaculos[0].y)
 						||
-						(j == obstaculos[1].x-1) && (i == obstaculos[1].y)
+						(j == obstaculos[1].x) && (i == obstaculos[1].y)
 						||
-						(j == obstaculos[2].x-1) && (i == obstaculos[2].y)
+						(j == obstaculos[2].x) && (i == obstaculos[2].y)
 						||
-						(j == obstaculos[3].x-1) && (i == obstaculos[3].y)
+						(j == obstaculos[3].x) && (i == obstaculos[3].y)
 						||
-						(j == obstaculos[4].x-1) && (i == obstaculos[4].y)
+						(j == obstaculos[4].x) && (i == obstaculos[4].y)
 					){
                         // printf("_[C");
                         printf("@@@");
+						
+						// if((j == noviaDeLisa.ubi.x-1) && (i == noviaDeLisa.ubi.y))
+						if(proximo(noviaDeLisa.ubi, (coor){j+1, i}) > 0)
+							impactoConEntidad = 1;
+
 						j = j+2;
 
-                    }else if((j == noviaDeLisa.ubi.x-1) && (i == noviaDeLisa.ubi.y)){
+                    }else if((j == noviaDeLisa.ubi.x) && (i == noviaDeLisa.ubi.y) && impactoConEntidad == 0){
                         printf("L*");
 						j++;
                     } else{
@@ -962,40 +1111,14 @@ int dibujarEscena(char d[max][max2], int loc){
 			if (noviaDeLisa.ubi.x > 50 && noviaDeLisa.ubi.y < 10 && noviaDeLisa.ubi.y > 4){
 				// cinematica(103);
 				// freeze(2);
+				impactoConEntidad = 3;
 				return 3;
-			}
-
-			for (int m = 0; m < 5; m++){
-				// checkea si hiciste contacto con un obstaculo
-				if (proximo(noviaDeLisa.ubi, obstaculos[m]) > 0){
-					noviaDeLisa.HP = noviaDeLisa.HP - 25;
-					freeze_ms(1000);
-					// si perdiste todo el hp volves a casa y alguien entrego la flor por vos
-					if(noviaDeLisa.HP == 0){	return 2;	}
-					// sino sale del minijuego pero seguis en el vecino
-					return 1;
-				}
-
-				// todos los obstaculos se mueven 4 a la izq
-				obstaculos[m].x = obstaculos[m].x - 4;
-
-				// el obstaculo q se pasa d largo del mapa reinicia ubi
-				if(obstaculos[m].x < 10){
-					obstaculos[m].x = 56;
-					obstaculos[m].y = noviaDeLisa.ubi.y;
-				}
 			}
 
 			break;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 		case 4:											//DIBUJA LA ESCENA DEL VECINO 2
-			
-			// CHECKEA SI LLEGASTE A ALGUN VECINO
-			if (noviaDeLisa.ubi.y == 12 || noviaDeLisa.ubi.x == 10 || noviaDeLisa.ubi.x == 50){
-				printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-				return 3;
-			}
 
 			// ESTE FOR SOLO DIBUJA LA ESCENA
             for(int i = max-1; i > 0; i--){
@@ -1007,19 +1130,35 @@ int dibujarEscena(char d[max][max2], int loc){
 
 					}else if(((j == balones[0].x) && (i == balones[0].y)) || ((j == balones[5].x) && (i == balones[5].y))){
                         printf("()");
+						
+						if (proximo(noviaDeLisa.ubi, (coor){j, i}) >= 2){
+							noviaDeLisa.HP = noviaDeLisa.HP - 25;
+							impactoConEntidad = 1;
+						}
 						j = j+1;
-
+						
                     }else if (((j == balones[1].x) && (i == balones[1].y)) || ((j == balones[3].x) && (i == balones[3].y))){
 						printf("~O)");
+						
+						if (proximo(noviaDeLisa.ubi, (coor){j+1, i}) >= 1){
+							noviaDeLisa.HP = noviaDeLisa.HP - 25;
+							impactoConEntidad = 1;
+						}
 						j = j+2;
-
+						
 					}else if(((j == balones[2].x-1) && (i == balones[2].y)) || ((j == balones[4].x-1) && (i == balones[4].y))){
 						printf("(O~");
+						
+						if (proximo(noviaDeLisa.ubi, (coor){j, i}) >= 1){
+							noviaDeLisa.HP = noviaDeLisa.HP - 25;
+							impactoConEntidad = 1;
+						}
 						j = j+2;
-
+						
 					}else if((j == noviaDeLisa.ubi.x) && (i == noviaDeLisa.ubi.y)){
                         printf("L*");
 						j++;
+						
                     } else{
                         printf("%c", d[max-i][j]);
                     }
@@ -1028,57 +1167,7 @@ int dibujarEscena(char d[max][max2], int loc){
                 printf("               ");
                 printf("\n");
             }
-			
-			// PRIMERO CHECKEA SI TE IMPACTA UN BALON
-			// 	SINO ACTUALIZA LA UBI DEL BALON EN EL switch DE ABAJO
-			for (int b = 0; b < 6; b++){
-				if (proximo(noviaDeLisa.ubi, balones[b]) > 0){
-					noviaDeLisa.HP = noviaDeLisa.HP - 25;
-					freeze_ms(1000);
-					// si perdiste todo el hp volves a casa y alguien entrego la flor por vos
-					if(noviaDeLisa.HP == 0){	return 2;	}
-					// sino sale del minijuego pero seguis en el vecino
-					return 1;
-				}
 
-				// TODOS LOS if RESTARTEAN LA UBI DE LOS BALONES SI SE PASAN DE LARGO
-				// 	SINO SOLO SE MUEVEN
-				switch (b){
-					case 0:
-					case 5:
-						if(balones[b].y < 4){
-							balones[b].y = 12;
-							balones[b].x = noviaDeLisa.ubi.x;
-						} else{
-							balones[b].y = balones[b].y - 2;
-						}
-						break;
-
-					case 1:
-					case 3:
-						if(balones[b].x > 40){
-							balones[b].x = 10;
-							balones[b].y = noviaDeLisa.ubi.y;
-						} else{
-							balones[b].x = balones[b].x + 5;
-						}
-						break;
-
-					case 2:
-					case 4:
-						if(balones[b].x < 20){
-							balones[b].x = 50;
-							balones[b].y = noviaDeLisa.ubi.y;
-						} else{
-							balones[b].x = balones[b].x - 5;
-						}
-						break;
-					
-					default:
-						break;
-				}
-				
-			}
 			break;
 
         default:

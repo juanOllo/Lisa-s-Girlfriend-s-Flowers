@@ -1,6 +1,11 @@
 #include "ingame.h"
 
 int main() {
+
+	if (access("errors.txt", F_OK) == 0) {
+		remove("errors.txt");
+	}
+
 	srand(time(NULL));	//Sirve para q rand() no de siempre los mismos numeros randoms
 						// todavia no probe si es necesario tenerlo aca
 
