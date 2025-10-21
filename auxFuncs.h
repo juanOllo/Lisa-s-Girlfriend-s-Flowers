@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <time.h>
+// #include <time.h>
 // #include <pthread.h>
 
 // #include <assert.h>
@@ -40,9 +40,7 @@ struct Player {
 // No es necesario pero las defino aca para encontrarlas mas rapido
 void actualizarHP(int hp);  
 void actualizarMenuVecino(int vecinoFocusOption);
-void cargaDeEscena(char d[max][max2], int l);
-void cinematica(int l/*line*/, int segs);
-void freeze_ms(int ms);
+void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], int l);
 void guardarPartida(struct Player *ndl);
 void leerEscuchar(int cont);
 void marginTop();
@@ -64,10 +62,19 @@ void error1(char errorMsj[100]){
 	fclose(errors);
 }
 
-void error2(int a){
+void error2(char msj[100], int a){
+    FILE *errors;
+
+	errors = fopen("errors.txt", "a");
+	fprintf(errors, "%s %d", msj, a);
+	fprintf(errors, "\n");
+	fclose(errors);
+}
+
+void error3(char a){
     FILE *errors;
 	errors = fopen("errors.txt", "a");
-	fprintf(errors, "%d", a);
+	fprintf(errors, "%c", a);
 	fprintf(errors, "\n");
 	fclose(errors);
 }
@@ -77,23 +84,24 @@ void error2(int a){
 
 void actualizarHP(int hp){
     
-    printf("\n\n\t                                      ");
+    // printf("\n\n\t                                      ");
+    printf("\n\n\t\t                                   ");
     switch (hp){
         case 100:
             // printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++++] \n");
-            printf(" ENERGIA SOCIAL: [////////] \n");
+            printf(" ENERGIA: [////////] \n");
             break;
         case 75:
-            printf(" ENERGIA SOCIAL: [//////--] \n");
+            printf(" ENERGIA: [//////--] \n");
             break;
         case 50:
-            printf(" ENERGIA SOCIAL: [////----] \n");
+            printf(" ENERGIA: [////----] \n");
             break;
         case 25:
-            printf(" ENERGIA SOCIAL: [//------] \n");
+            printf(" ENERGIA: [//------] \n");
             break;
         case 0:
-            printf(" ENERGIA SOCIAL: [--------] \n");
+            printf(" ENERGIA: [--------] \n");
             break;
         default:
             break;
@@ -130,9 +138,10 @@ void actualizarMenuVecino(int vecinoFocusOption){
 
 
 
-// CARGA LA MATRIZ CON UNA ESCENA DEL DOCUMENTO escenas.txt 
-//              COMENZANDO EN LA LINEA l
-void cargaDeEscena(char d[max][max2], int l){
+// CARGA 2 MATRIZES CON ESCENAS DEL DOCUMENTO escenas.txt 
+//  COMENZANDO EN LA LINEA l
+//  CARGA LAS ESCENA QUE SE MUESTRA EN PANTALLA Y LA QUE MARCA LOS LIMITES AL MOVIMIENTO
+void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], int l){
     FILE *f;
     int i = 0;
     int j = 0;
@@ -152,23 +161,46 @@ void cargaDeEscena(char d[max][max2], int l){
     if(f != NULL){
 		
         for (i=1; i<=max; i++){
-			d[i][0] = '#';
+			escenaVisual[i][0] = '#';
 			//d[i][max] = 'j';
             fscanf(f, "%c", &aux);
             for(j=1; j<=max2; j++){
-                fscanf(f, "%c", &d[i][j]);
+                fscanf(f, "%c", &escenaVisual[i][j]);
             }
             fscanf(f, "%c", &aux);
             fscanf(f, "%c", &aux);
         }
 		j=0;
 		while(j < max2){
-            d[max][j] = '#';
-            d[0][j] = '#';
+            escenaVisual[max][j] = '#';
+            escenaVisual[0][j] = '#';
             j++;
 		}
 
-        //lo usaba para solucionar lo de las esquinas de las escenas de la calle, ponele
+        /**///El unico agregado a que lo diferencia de cargar una sola escena
+        /**/fscanf(f, "%c", &aux);
+        /**/fgets(linea, sizeof(linea), f);
+        /**/fscanf(f, "%c", &aux);
+        /**/
+        /**/for (i=1; i<=max; i++){
+		/**/	escenaLimites[i][0] = '#';
+		/**/	//d[i][max] = 'j';
+        /**/    fscanf(f, "%c", &aux);
+        /**/    for(j=1; j<=max2; j++){
+        /**/        fscanf(f, "%c", &escenaLimites[i][j]);
+        /**/    }
+        /**/    fscanf(f, "%c", &aux);
+        /**/    fscanf(f, "%c", &aux);
+        /**/}
+		/**/j=0;
+		/**/while(j < max2){
+        /**/    escenaLimites[max][j] = '#';
+        /**/    escenaLimites[0][j] = '#';
+        /**/    j++;
+		/**/}
+        /**////////////////////////////////////////////////////////////////////
+
+        //lo usaba para intentar solucionar lo de las esquinas de las escenas de la calle, ponele
         // d[max][1] = 'j';
 		
     }
@@ -179,65 +211,6 @@ void cargaDeEscena(char d[max][max2], int l){
 	fclose(f);
 
     // matrisDebug(d);
-}
-
-
-
-
-// FUNCION QUE DIBUJA UNA CINEMATICA
-//  l = linea de la cinemática en cinematicas.txt
-//  segs = segundos que se pausa la pantalla al finalizar la cinemática
-void cinematica(int l/*line*/, int segs){
-
-    // Con esto oculto la barra de hp durante las cinematicas
-    printf("\n\n\t                                                                      \n");
-    printf("\e[%iA", 3);
-
-
-	FILE *f;
-    char aux;
-    int contador = 0;
-    char linea[max2+1];
-    
-    f = fopen("cinematicas.txt", "r");
-    
-    while(contador < l){
-        fscanf(f, "%c", &aux);
-		fscanf(f, "%c", &aux);
-        fgets(linea, sizeof(linea), f);
-        fscanf(f, "%c", &aux);
-        contador++;
-    }
-
-    printf("\e[%iA", 15);
-    
-    if(f != NULL){
-        for (contador = 1; contador <= max*2-2; contador++){
-			// printf("                            ");
-			printf("                              ");
-			fscanf(f, "%c", &aux);
-            fgets(linea, sizeof(linea), f);
-			printf("%s", linea);
-        }
-    }
-    else{
-        printf("error");
-    }
-
-	fclose(f);
-
-    if (segs > 0)
-        freeze_ms(segs);
-}
-
-
-
-
-//  PAUSA LA PANTALLA s MILISEGUNDOS
-void freeze_ms(int ms) {
-    clock_t start_time = clock();
-    clock_t wait_time = ms * (CLOCKS_PER_SEC / 1000);
-    while (clock() - start_time < wait_time) {}
 }
 
 
