@@ -5,8 +5,9 @@
 #define max2 60
 #define SIZE 200
 
-void cinematica(int l/*line*/, int segs);
+void cinematica(int l/*line*/, int mss);
 void freeze_ms(int ms);
+
 
 
 // FUNCIONES DE CINEMATICAS ESPECIFICAS
@@ -45,8 +46,8 @@ void freeze_ms(int ms) {
 
 // FUNCION QUE DIBUJA UNA CINEMATICA
 //  l = linea de la cinemática en cinematicas.txt
-//  segs = segundos que se pausa la pantalla al finalizar la cinemática
-void cinematica(int l/*line*/, int segs){
+//  mss = milisegundos que se pausa la pantalla al finalizar la cinemática
+void cinematica(int l/*line*/, int mss){
 
     // Con esto oculto la barra de hp durante las cinematicas
     printf("\n\n\t                                                                      \n");
@@ -85,6 +86,6 @@ void cinematica(int l/*line*/, int segs){
 
 	fclose(f);
 
-    if (segs > 0)
-        freeze_ms(segs);
+    if (mss > 0)
+        freeze_ms(mss);
 }

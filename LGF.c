@@ -1,5 +1,7 @@
 #include "ingame.h"
 
+Player actualGame;
+
 int main() {
 
 	if (access("errors.txt", F_OK) == 0) {

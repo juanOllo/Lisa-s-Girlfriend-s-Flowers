@@ -26,29 +26,29 @@ typedef struct {
 	int y;
 } coor;
 
-struct Player {
-	int HP;                 //puntos de hp de ndl
-	int cantFlores;         //cantidad de flores en mano
-	int misionesCumplidas;  //cantidad de flores entregadas
-	int primeraVez;         //aux q voy a usar para las cinematicas creo
-	int lucides[4];         //guarda las veces q gastaste todos los dialogos a cada vecino
-	coor ubi;               //ubicacion actual de ndl
-	int calleLoc;           //en que seccion del juego se encuentra ndl
-};
+typedef struct {
+	int HP;                 // puntos de hp de ndl
+	int cantFlores;         // cantidad de flores en mano
+	int misionesCumplidas;  // cantidad de flores entregadas
+	int primeraVez;         // aux q voy a usar para las cinematicas creo
+	int lucides[4];         // guarda las veces q gastaste todos los dialogos a cada vecino
+	coor ubi;               // ubicacion actual de ndl
+	int calleLoc;           // en que seccion del juego se encuentra ndl
+} Player;
 
 
 // No es necesario pero las defino aca para encontrarlas mas rapido
 void actualizarHP(int hp);  
 void actualizarMenuVecino(int vecinoFocusOption);
 void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], int l);
-void guardarPartida(struct Player *ndl);
+void guardarPartida(Player *ndl);
 void leerEscuchar(int cont);
-void marginTop();
 void matrisDebug(char matris[max][max2]);
 coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
 coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
 int proximo(coor u, coor e);
 coor randomUbi(coor e, char limit[max][max2]);
+void ubicarPivote();
 
 
 
@@ -217,7 +217,7 @@ void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], 
 
 
 // Guarda TODOS LOS DATOS DE NDL EN save.txt
-void guardarPartida(struct Player *ndl){
+void guardarPartida(Player *ndl){
 
     char toSaveArray[16];
 
@@ -306,19 +306,6 @@ void leerEscuchar(int cont){
 	printf("\t%s\n", dialogo);
 	//printf("\nTermina escuchar.\n");
 
-}
-
-
-
-
-void marginTop(){
-	printf("\e[%iA", 100);
-
-    // Margin top
-    printf("\n\n\n\n\n");
-
-    // Altura de los frames.
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 }
 
 
@@ -562,4 +549,17 @@ coor randomUbi(coor e, char limit[max][max2]){
         return aux;
     }
 
+}
+
+
+
+
+void ubicarPivote(){
+	printf("\e[%iA", 100);
+
+    // Margin top
+    printf("\n\n\n\n\n");
+
+    // Altura de los frames.
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 }
