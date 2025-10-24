@@ -16,8 +16,10 @@
 #include <pthread.h>
 #include <stdbool.h>
 
-#define max 16
-#define max2 60
+// #define max 16
+#define max 17
+// #define max2 60
+#define max2 62
 #define SIZE 200
 
 
@@ -77,6 +79,24 @@ void error3(char a){
 	fprintf(errors, "%c", a);
 	fprintf(errors, "\n");
 	fclose(errors);
+}
+
+void debugEscena(char escena[max][max2]){
+    FILE *errors;
+    errors = fopen("errors.txt", "a");
+
+    char *escenaFila[max2];
+
+    for(int i = 0; i < max; i++){
+
+        // escenaFila = &escena[0][i];
+        escenaFila[0] = &escena[i][0];
+
+        fprintf(errors, "%.62s", escenaFila[0]);
+        fprintf(errors, "\n");
+    }
+
+    fclose(errors);
 }
 
 
@@ -146,59 +166,56 @@ void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], 
     int i = 0;
     int j = 0;
     char aux;
-    int inicio = 0;
     char linea[max2+2];
     
     f = fopen("escenas.txt", "r");
     
-    while(inicio < l){
+    while(i < l-1){
         fscanf(f, "%c", &aux);
         fgets(linea, sizeof(linea), f);
-        fscanf(f, "%c", &aux);
-        inicio++;
+        // fscanf(f, "%c", &aux);
+        i++;
     }
     
     if(f != NULL){
 		
-        for (i=1; i<=max; i++){
-			escenaVisual[i][0] = '#';
-			//d[i][max] = 'j';
-            fscanf(f, "%c", &aux);
-            for(j=1; j<=max2; j++){
+        for (i = 0; i < max; i++){
+            for(j = 0; j < max2; j++){
                 fscanf(f, "%c", &escenaVisual[i][j]);
             }
-            fscanf(f, "%c", &aux);
+            // escenaVisual[i][0] = '#';
+            // escenaVisual[i][max2-1] = '#';
             fscanf(f, "%c", &aux);
         }
+        
 		j=0;
-		while(j < max2){
-            escenaVisual[max][j] = '#';
-            escenaVisual[0][j] = '#';
-            j++;
-		}
+		// while(j < max2){
+        //     escenaVisual[max-1][j] = '#';
+        //     escenaVisual[0][j] = '#';
+        //     j++;
+		// }
+
+        debugEscena(escenaVisual);
 
         /**///El unico agregado a que lo diferencia de cargar una sola escena
-        /**/fscanf(f, "%c", &aux);
-        /**/fgets(linea, sizeof(linea), f);
-        /**/fscanf(f, "%c", &aux);
-        /**/
-        /**/for (i=1; i<=max; i++){
-		/**/	escenaLimites[i][0] = '#';
-		/**/	//d[i][max] = 'j';
-        /**/    fscanf(f, "%c", &aux);
-        /**/    for(j=1; j<=max2; j++){
+        /**/for (i = 0; i <= max; i++){
+        /**/    for(j = 0; j < max2; j++){
         /**/        fscanf(f, "%c", &escenaLimites[i][j]);
         /**/    }
-        /**/    fscanf(f, "%c", &aux);
+        // /**/    escenaLimites[i][0] = '#';
+        // /**/    escenaLimites[i][max2-1] = '#';
         /**/    fscanf(f, "%c", &aux);
         /**/}
-		/**/j=0;
-		/**/while(j < max2){
-        /**/    escenaLimites[max][j] = '#';
-        /**/    escenaLimites[0][j] = '#';
-        /**/    j++;
-		/**/}
+        /**/
+        /**/j=0;
+		// /**/while(j < max2){
+        // /**/    escenaLimites[max-1][j] = '#';
+        // /**/    escenaLimites[0][j] = '#';
+        // /**/    j++;
+		// /**/}
         /**////////////////////////////////////////////////////////////////////
+
+        debugEscena(escenaLimites);
 
         //lo usaba para intentar solucionar lo de las esquinas de las escenas de la calle, ponele
         // d[max][1] = 'j';
@@ -500,12 +517,9 @@ coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][ma
     }while (isOk == 0);
     
 
-    if(movimientoLimit[max - nuevaUbiAux.y][nuevaUbiAux.x] == '#' 
-        // ||
-        // nuevaUbiAux.y<0
-    ) {
-        // error("colision");
+    if(movimientoLimit[max - nuevaUbiAux.y][nuevaUbiAux.x] == '#') {
         return actualUbi;
+        
     } else {
         return nuevaUbiAux;
     }

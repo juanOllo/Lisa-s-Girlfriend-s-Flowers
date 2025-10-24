@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <time.h>
 
-#define max 16
-#define max2 60
+// #define max 16
+#define max 17
+// #define max2 60
+#define max2 62
 #define SIZE 200
 
 void cinematica(int l/*line*/, int mss);
@@ -57,27 +59,30 @@ void cinematica(int l/*line*/, int mss){
 	FILE *f;
     char aux;
     int contador = 0;
-    char linea[max2+1];
+    char linea[max2+2];
+    char linea2[max2+1];
     
     f = fopen("cinematicas.txt", "r");
     
     while(contador < l){
         fscanf(f, "%c", &aux);
-		fscanf(f, "%c", &aux);
+		// fscanf(f, "%c", &aux);
         fgets(linea, sizeof(linea), f);
-        fscanf(f, "%c", &aux);
+        // fscanf(f, "%c", &aux);
         contador++;
     }
 
     printf("\e[%iA", 15);
     
     if(f != NULL){
-        for (contador = 1; contador <= max*2-2; contador++){
+        for (contador = 0; contador <= max-3; contador++){
 			// printf("                            ");
 			printf("                              ");
-			fscanf(f, "%c", &aux);
+			// printf("                             ");
+			// fscanf(f, "%c", &aux);
             fgets(linea, sizeof(linea), f);
-			printf("%s", linea);
+			printf("%.60s", linea+1);
+            printf("\n");
         }
     }
     else{
