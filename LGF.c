@@ -19,6 +19,9 @@ int main() {
 
     // MAIN MENU
 	do{
+		// actualGame = noviaDeLisa;
+		// error2("actualGame.hp:", actualGame.HP);
+
 		//DEVUELVE EL CURSOR AL PRINCIPIO DEL TERMINAL
 		printf("\e[%iA", 100);
 
@@ -51,7 +54,7 @@ int main() {
 			case '1':
 				// COMENZAR A JUGAR
 				cls();
-                playGame();
+                playGame(&actualGame);
 				break;
 				
 			case '2':
@@ -77,6 +80,7 @@ int main() {
 				if (access("save.txt", F_OK) == 0) {
 					remove("save.txt");
 				}
+				actualGame.ubi.y = 0;
 				break;
 
 			default:

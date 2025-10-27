@@ -36,16 +36,6 @@ void tomarCurasCinematica(){
 
 
 
-//  PAUSA LA PANTALLA s MILISEGUNDOS
-void freeze_ms(int ms) {
-    clock_t start_time = clock();
-    clock_t wait_time = ms * (CLOCKS_PER_SEC / 1000);
-    while (clock() - start_time < wait_time) {}
-}
-
-
-
-
 // FUNCION QUE DIBUJA UNA CINEMATICA
 //  l = linea de la cinemática en cinematicas.txt
 //  mss = milisegundos que se pausa la pantalla al finalizar la cinemática
@@ -66,9 +56,7 @@ void cinematica(int l/*line*/, int mss){
     
     while(contador < l){
         fscanf(f, "%c", &aux);
-		// fscanf(f, "%c", &aux);
         fgets(linea, sizeof(linea), f);
-        // fscanf(f, "%c", &aux);
         contador++;
     }
 
@@ -76,10 +64,7 @@ void cinematica(int l/*line*/, int mss){
     
     if(f != NULL){
         for (contador = 0; contador <= max-3; contador++){
-			// printf("                            ");
 			printf("                              ");
-			// printf("                             ");
-			// fscanf(f, "%c", &aux);
             fgets(linea, sizeof(linea), f);
 			printf("%.60s", linea+1);
             printf("\n");
@@ -93,4 +78,14 @@ void cinematica(int l/*line*/, int mss){
 
     if (mss > 0)
         freeze_ms(mss);
+}
+
+
+
+
+//  PAUSA LA PANTALLA s MILISEGUNDOS
+void freeze_ms(int ms) {
+    clock_t start_time = clock();
+    clock_t wait_time = ms * (CLOCKS_PER_SEC / 1000);
+    while (clock() - start_time < wait_time) {}
 }

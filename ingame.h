@@ -56,15 +56,23 @@ char saveArray[16];
 
 
 // ESTA FUNCION TE VA A MOVER ENTRE DIFERENTES MENUS JUGABLES (CASA, CALLE, CASA DE VECINO)
-void playGame(){
+void playGame(Player *actualGame){
 
 	///////////////////CARGA DE ESCENAS DE LA CASA////////////
 	/**/ cargarEscenas(escCasa, escCasaLimit, 1);
 	/////////////////////////////////////////////////////////
 
-	//	SI EXISTE EL ARCHIVO save.txt ENTONCES CARGA LOS DATOS EN EL PERSONAJE
-	//		SINO INICIALIZA EL PERSONAJE DESDE 0
-	if (access("save.txt", F_OK) == 0) {
+	
+		// Este if funciona suponiendo qie nunca voy a poder alcanzar la ubi y=0
+		// 	Por eso creo que tendria q cambiarlo.
+	// Este if mantiene guardada la partida actual cuando vos volves al menu principal.
+	if (actualGame->ubi.y != 0){
+		noviaDeLisa = *actualGame;
+		
+		//	SI EXISTE EL ARCHIVO save.txt ENTONCES CARGA LOS DATOS EN EL PERSONAJE
+		//		SINO INICIALIZA EL PERSONAJE DESDE 0
+	} else if (access("save.txt", F_OK) == 0) {
+
 	// access(...) == 0: verifica que el archivo existe y es accesible.
 
 		// fopen(...): intenta abrirlo, y puede fallar por otras razones 
@@ -133,15 +141,17 @@ void playGame(){
 	/**/ entyCoor[14] = (coor){31, 12};		//vecino 4
 	////////////////////////////////////////////////////////////////
 
-	// if (noviaDeLisa.primeraVez <= 0){
-	// 	ubicarPivote();
-	// 	cinematica(1, 1000);
-	// 	printf("\e[%iA", 1);
-	// 	printf("\tPresiona un boton para continuar...\n");
-	// 	char a = getch();
-	// 	// printf("\e[%iA", 1);
-	// }
-	
+	if (noviaDeLisa.primeraVez == 0){
+		ubicarPivote();
+		cinematica(970, 5000);
+		printf("\e[%iA", 1);
+		printf("\tPresiona X para continuar...\n");
+		char a = getch();
+		while(a != 'x' && a != 'X'){
+			a = getch();
+		}
+		noviaDeLisa.primeraVez++;
+	}
 
 	int op;
 
@@ -183,6 +193,8 @@ void playGame(){
 				break;
 			
 			default:
+				// Cuando vuelvas al menu principal guardas la partida actual temporalmente
+				*actualGame = noviaDeLisa;
                 op = 7;
                 break;
 		}
@@ -209,6 +221,18 @@ void playGame(){
 int menuDeCasa(){
 
 	noviaDeLisa.calleLoc = 0;
+
+	if (noviaDeLisa.primeraVez == 1 && noviaDeLisa.HP < 100){
+		ubicarPivote();
+		cinematica(987, 5000);
+		printf("\e[%iA", 1);
+		printf("\tPresiona X para continuar...\n");
+		char a = getch();
+		while(a != 'x' && a != 'X'){
+			a = getch();
+		}
+		noviaDeLisa.primeraVez++;
+	}
 
     int estadoEnCasa = 0;
 
@@ -755,19 +779,22 @@ void* threadActualizarUbisDeBalones(void* arg) {
 
 void* threadActualizarUbisDeProyectiles(void* arg) {
     while (seguirDibujando) {
-		if (proyectiles[0].y > noviaDeLisa.ubi.y){
-			proyectiles[0].y = proyectiles[0].y - 1;
-		} else if (proyectiles[0].y < noviaDeLisa.ubi.y){
-			proyectiles[0].y = proyectiles[0].y + 1;
+		
+		for (int i = 0; i < 2; i++)
+		{
+			if (proyectiles[i].y > noviaDeLisa.ubi.y + 1){
+				proyectiles[i].y = proyectiles[i].y - 1;
+			} else if (proyectiles[i].y < noviaDeLisa.ubi.y - 1){
+				proyectiles[i].y = proyectiles[i].y + 1;
+			}
+			
+			if (proyectiles[i].x > noviaDeLisa.ubi.x + 3){
+				proyectiles[i].x = proyectiles[i].x - 2;
+			} else if (proyectiles[i].x < noviaDeLisa.ubi.x - 3){
+				proyectiles[i].x = proyectiles[i].x + 2;
+			}
 		}
 		
-		if (proyectiles[0].x > noviaDeLisa.ubi.x){
-			proyectiles[0].x = proyectiles[0].x - 3;
-		} else if (proyectiles[0].x < noviaDeLisa.ubi.x){
-			proyectiles[0].x = proyectiles[0].x + 3;
-		}
-
-		// noviaDeLisa.ubi.x = noviaDeLisa.ubi.x + 1;
 
 		if (impactoConEntidad != 0)
 			pthread_exit(NULL);
@@ -971,7 +998,8 @@ int vecinoGameplay(){
 			noviaDeLisa.ubi = (coor){12, 8};
 			actualizarHP(noviaDeLisa.HP);
 
-			proyectiles[0] = (coor){55, 8};
+			proyectiles[0] = (coor){57, 8};
+			proyectiles[1] = (coor){4, 8};
 
 			// INICIA EL MINIJUEGO DE LOS BALONES
 			seguirDibujando = true;
@@ -989,7 +1017,7 @@ int vecinoGameplay(){
 			while (impactoConEntidad == 0){
 				freeze_ms(50);
 
-				noviaDeLisa.ubi = movimiento2(noviaDeLisa.ubi, escVecinoLimit, 4);
+				noviaDeLisa.ubi = movimiento2(noviaDeLisa.ubi, escVecinoLimit, 5);
 				// noviaDeLisa.ubi.y = movimiento2(noviaDeLisa.ubi, escVecinoLimit, 3).y;
 				// freeze_ms(100); // Pequeña pausa para evitar que el thread de dibujo consuma demasiados recursos
 
@@ -1269,7 +1297,7 @@ int dibujarEscena(char d[max][max2], int loc){
 
 			break;
 
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 		case 5:											//DIBUJA LA ESCENA DEL VECINO 3
 
 			// ESTE FOR SOLO DIBUJA LA ESCENA
@@ -1277,7 +1305,11 @@ int dibujarEscena(char d[max][max2], int loc){
                 printf("                              ");
 				
                 for(int j = 1; j < max2-1; j++){
-					if (j == proyectiles[0].x && i == proyectiles[0].y) {
+					if ((j == proyectiles[0].x && i == proyectiles[0].y)
+							||
+						(j == proyectiles[1].x && i == proyectiles[1].y)
+				
+				) {
 						printf("*");
 						escVecino[max-i][j] = '~';
 

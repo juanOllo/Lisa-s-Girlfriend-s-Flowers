@@ -173,61 +173,32 @@ void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], 
     while(i < l-1){
         fscanf(f, "%c", &aux);
         fgets(linea, sizeof(linea), f);
-        // fscanf(f, "%c", &aux);
         i++;
     }
     
     if(f != NULL){
-		
+
+        // Carga la escena que se va a mostrar en pantalla.
         for (i = 0; i < max; i++){
             for(j = 0; j < max2; j++){
                 fscanf(f, "%c", &escenaVisual[i][j]);
             }
-            // escenaVisual[i][0] = '#';
-            // escenaVisual[i][max2-1] = '#';
             fscanf(f, "%c", &aux);
         }
-        
-		j=0;
-		// while(j < max2){
-        //     escenaVisual[max-1][j] = '#';
-        //     escenaVisual[0][j] = '#';
-        //     j++;
-		// }
 
-        debugEscena(escenaVisual);
-
-        /**///El unico agregado a que lo diferencia de cargar una sola escena
-        /**/for (i = 0; i <= max; i++){
-        /**/    for(j = 0; j < max2; j++){
-        /**/        fscanf(f, "%c", &escenaLimites[i][j]);
-        /**/    }
-        // /**/    escenaLimites[i][0] = '#';
-        // /**/    escenaLimites[i][max2-1] = '#';
-        /**/    fscanf(f, "%c", &aux);
-        /**/}
-        /**/
-        /**/j=0;
-		// /**/while(j < max2){
-        // /**/    escenaLimites[max-1][j] = '#';
-        // /**/    escenaLimites[0][j] = '#';
-        // /**/    j++;
-		// /**/}
-        /**////////////////////////////////////////////////////////////////////
-
-        debugEscena(escenaLimites);
-
-        //lo usaba para intentar solucionar lo de las esquinas de las escenas de la calle, ponele
-        // d[max][1] = 'j';
+        // Carga la escena que va a marcar los limites.
+        for (i = 0; i <= max; i++){
+            for(j = 0; j < max2; j++){
+                fscanf(f, "%c", &escenaLimites[i][j]);
+            }
+            fscanf(f, "%c", &aux);
+        }
 		
-    }
-    else{
+    } else {
         printf("error");
     }
 
 	fclose(f);
-
-    // matrisDebug(d);
 }
 
 
@@ -366,7 +337,6 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
         input = getch();
 
         switch (casaOCalle){
-
             case 0:
             case 1:
                 switch (input){
@@ -426,7 +396,6 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
                 }
             break;
 
-
             case 4:
                 switch (input){
                     case 'd':
@@ -448,6 +417,35 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
                     case 'S':
                     case 'P':
                         nuevaUbiAux.y = nuevaUbiAux.y - 2;
+                        break;
+                    // case '.':
+                    //     break;
+                    default:
+                        break;
+                }
+            break;
+
+            case 5:
+                switch (input){
+                    case 'd':
+                    case 'D':
+                    case 'M':
+                        nuevaUbiAux.x = nuevaUbiAux.x + 3;
+                        break;
+                    case 'a':
+                    case 'A':
+                    case 'K':
+                        nuevaUbiAux.x = nuevaUbiAux.x - 3;
+                        break;
+                    case 'w':
+                    case 'W':
+                    case 'H':
+                        nuevaUbiAux.y = nuevaUbiAux.y + 1;
+                        break;
+                    case 's':
+                    case 'S':
+                    case 'P':
+                        nuevaUbiAux.y = nuevaUbiAux.y - 1;
                         break;
                     // case '.':
                     //     break;
