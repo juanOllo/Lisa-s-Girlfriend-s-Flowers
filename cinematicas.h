@@ -28,9 +28,9 @@ void entregar2daFlorCinematica(){
 
 void tomarCurasCinematica(){
     cinematica(800, 800);
-    cinematica(817, 400);
+    cinematica(817, 300);
     cinematica(834, 400);
-    cinematica(766, 200);
+    cinematica(766, 500);
 }
 
 
@@ -44,7 +44,10 @@ void cinematica(int l/*line*/, int mss){
     // Con esto oculto la barra de hp durante las cinematicas
     printf("\n\n\t                                                                      \n");
     printf("\e[%iA", 3);
+    // Ahora en pivote vuelve a estar ubicado correctamente
 
+    // Y ahora ubico el pivote para dibujar la cinemática como dibujo las escenas
+    printf("\e[%iA", 15);
 
 	FILE *f;
     char aux;
@@ -59,8 +62,6 @@ void cinematica(int l/*line*/, int mss){
         fgets(linea, sizeof(linea), f);
         contador++;
     }
-
-    printf("\e[%iA", 15);
     
     if(f != NULL){
         for (contador = 0; contador <= max-3; contador++){
@@ -69,8 +70,7 @@ void cinematica(int l/*line*/, int mss){
 			printf("%.60s", linea+1);
             printf("\n");
         }
-    }
-    else{
+    } else {
         printf("error");
     }
 

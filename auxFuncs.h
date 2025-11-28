@@ -22,6 +22,7 @@
 #define max2 62
 #define SIZE 200
 
+int osMultiplicadorDeVelocidad = velocity;
 
 typedef struct {
 	int x;
@@ -29,7 +30,7 @@ typedef struct {
 } coor;
 
 typedef struct {
-	int HP;                 // puntos de hp de ndl
+	int hp;                 // puntos de hp de ndl
 	int cantFlores;         // cantidad de flores en mano
 	int misionesCumplidas;  // cantidad de flores entregadas
 	int primeraVez;         // aux q voy a usar para las cinematicas creo
@@ -43,7 +44,7 @@ typedef struct {
 void actualizarHP(int hp);  
 void actualizarMenuVecino(int vecinoFocusOption);
 void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], int l);
-void guardarPartida(Player *ndl);
+void guardarPartida(Player *ndl, int typeSave);
 void leerEscuchar(int cont);
 void matrisDebug(char matris[max][max2]);
 coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
@@ -99,6 +100,28 @@ void debugEscena(char escena[max][max2]){
     fclose(errors);
 }
 
+void ndlDataDebug(Player *ndl){
+    FILE *errors;
+
+	// errors = fopen("errors.txt", "a");
+	errors = fopen("errors.txt", "w");  // Modo "w" sobrescribe el archivo
+
+	fprintf(errors, "%s %d \n", "cantFlores:        ", ndl->cantFlores);
+	fprintf(errors, "%s %d \n", "misionesCumplidas: ", ndl->misionesCumplidas);
+	fprintf(errors, "%s %d \n", "primeraVez:        ", ndl->primeraVez);
+	fprintf(errors, "%s %d \n", "lucides[0]:        ", ndl->lucides[0]);
+	fprintf(errors, "%s %d \n", "lucides[1]:        ", ndl->lucides[1]);
+	fprintf(errors, "%s %d \n", "lucides[2]:        ", ndl->lucides[2]);
+	fprintf(errors, "%s %d \n", "lucides[3]:        ", ndl->lucides[3]);
+	fprintf(errors, "%s %d \n", "hp:                ", ndl->hp);
+	fprintf(errors, "%s %d \n", "ubi x:             ", ndl->ubi.x);
+	fprintf(errors, "%s %d \n", "ubi y:             ", ndl->ubi.y);
+	fprintf(errors, "%s %d \n", "calleLoc:          ", ndl->calleLoc);
+    
+	// fprintf(errors, "\n");
+	fclose(errors);
+}
+
 
 
 
@@ -107,21 +130,32 @@ void actualizarHP(int hp){
     // printf("\n\n\t                                      ");
     printf("\n\n\t\t                                   ");
     switch (hp){
-        case 100:
-            // printf("\n\t\t\t\t\t\tENERGIA SOCIAL: [++++++++] \n");
+        case 80:
             printf(" ENERGIA: [////////] \n");
             break;
-        case 75:
-            printf(" ENERGIA: [//////--] \n");
+        case 70:
+            printf(" ENERGIA: [/////// ] \n");
+            break;
+        case 60:
+            printf(" ENERGIA: [//////  ] \n");
             break;
         case 50:
-            printf(" ENERGIA: [////----] \n");
+            printf(" ENERGIA: [/////   ] \n");
             break;
-        case 25:
-            printf(" ENERGIA: [//------] \n");
+        case 40:
+            printf(" ENERGIA: [////    ] \n");
+            break;
+        case 30:
+            printf(" ENERGIA: [///     ] \n");
+            break;
+        case 20:
+            printf(" ENERGIA: [//      ] \n");
+            break;
+        case 10:
+            printf(" ENERGIA: [/       ] \n");
             break;
         case 0:
-            printf(" ENERGIA: [--------] \n");
+            printf(" ENERGIA: [        ] \n");
             break;
         default:
             break;
@@ -136,17 +170,17 @@ void actualizarHP(int hp){
 void actualizarMenuVecino(int vecinoFocusOption){
     switch (vecinoFocusOption){
         case 1:
-            printf("\t\t\t\t      _          .n.  _                |     |    \n");
-            printf("\t\t\t\t     |          C O D  |               |  |  |    \n");
-            printf("\t\t\t\t     | Dar Flor  *Y*   |       Volver  |     |    \n");
-            printf("\t\t\t\t     |_           |   _|               |  |  |    \n");
+            printf("\t\t\t\t\t _          .n.  _                |     |    \n");
+            printf("\t\t\t\t\t|          C O D  |               |  |  |    \n");
+            printf("\t\t\t\t\t| Dar Flor  *Y*   |       Volver  |     |    \n");
+            printf("\t\t\t\t\t|_           |   _|               |  |  |    \n");
             break;
 
         case 2:
-            printf("\t\t\t\t                 .n.          _        |     | _  \n");
-			printf("\t\t\t\t                C O D        |         |  |  |  |  \n");
-			printf("\t\t\t\t       Dar Flor  *Y*         | Volver  |     |  |  \n");
-			printf("\t\t\t\t                  |          |_        |  |  | _|  \n");
+            printf("\t\t\t\t\t            .n.          _        |     | _   \n");
+			printf("\t\t\t\t\t           C O D        |         |  |  |  |  \n");
+			printf("\t\t\t\t\t  Dar Flor  *Y*         | Volver  |     |  |  \n");
+			printf("\t\t\t\t\t             |          |_        |  |  | _|  \n");
             break;
         
         default:
@@ -205,61 +239,72 @@ void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], 
 
 
 // Guarda TODOS LOS DATOS DE NDL EN save.txt
-void guardarPartida(Player *ndl){
+// typeSabe = 0 para guardado automatico
+//          = 1 para guardado manual
+void guardarPartida(Player *ndl, int typeSabe){
 
     char toSaveArray[16];
 
     sprintf(&toSaveArray[0], "%d", ndl->cantFlores);
+    
     sprintf(&toSaveArray[1], "%d", ndl->misionesCumplidas);
+    
     sprintf(&toSaveArray[2], "%d", ndl->primeraVez);
+    
     sprintf(&toSaveArray[3], "%d", ndl->lucides[0]);
     sprintf(&toSaveArray[4], "%d", ndl->lucides[1]);
     sprintf(&toSaveArray[5], "%d", ndl->lucides[2]);
     sprintf(&toSaveArray[6], "%d", ndl->lucides[3]);
 
-    switch (ndl->HP){
-        case 100:
-            sprintf(&toSaveArray[7], "%d", ndl->HP);
+    switch (ndl->hp){
+        // case 100:
+        //     sprintf(&toSaveArray[7], "%d", ndl->hp);
+        //     break;
+        case 0:
+            // sprintf(&toSaveArray[7], "%d", 0);
+            // sprintf(&toSaveArray[8], "%d", 0);
+            // sprintf(&toSaveArray[9], "%d", ndl->hp);
+            sprintf(&toSaveArray[7], "000");
             break;
         
-        case 25:
-        case 50:
-        case 75:
-            sprintf(&toSaveArray[7], "%d", 0);
-            sprintf(&toSaveArray[8], "%d", ndl->HP);
-            break;
-
-        case 0:
-            sprintf(&toSaveArray[7], "%d", 0);
-            sprintf(&toSaveArray[8], "%d", 0);
-            sprintf(&toSaveArray[9], "%d", ndl->HP);
-            break;
+        // case 25:
+        // case 50:
+        // case 75:
+        // break;
         
         default:
+            sprintf(&toSaveArray[7], "0");
+            sprintf(&toSaveArray[8], "%d", ndl->hp);
             break;
     }
 
     if(ndl->ubi.x > 9){
         sprintf(&toSaveArray[10], "%d", ndl->ubi.x);
     } else {
-        sprintf(&toSaveArray[10], "%d", 0);
+        sprintf(&toSaveArray[10], "0");
         sprintf(&toSaveArray[11], "%d", ndl->ubi.x);
     }
     
     if(ndl->ubi.y > 9){
         sprintf(&toSaveArray[12], "%d", ndl->ubi.y);
     } else {
-        sprintf(&toSaveArray[12], "%d", 0);
+        sprintf(&toSaveArray[12], "0");
         sprintf(&toSaveArray[13], "%d", ndl->ubi.y);
     }
 
     sprintf(&toSaveArray[14], "%d", ndl->calleLoc);
 
-
+    // Guardo la informacion de toSaveArray en save.txt
     FILE *save;
 	save = fopen("save.txt", "w");
 	fprintf(save, toSaveArray);
 	fclose(save);
+
+    if (typeSabe == 1){
+        printf("\e[%iA", 1);
+        printf("\n\t+ [GUARDANDO PARTIDA] +");
+    }
+    
 }
 
 
@@ -547,16 +592,16 @@ int proximo(coor u, coor e){
 
 
 //  DEVUELVE UNA UBI RANDOM DENTRO DE LOS LIMITES
-coor randomUbi(coor e, char limit[max][max2]){ 
+coor randomUbi(coor abeja, char limit[max][max2]){ 
 	// srand(time(NULL));//Sirve para q rand() no de siempre los mismos numeros randoms
     coor aux;
     
-    aux.x = e.x + (rand() % 3) - 1;
-    aux.y = e.y + (rand() % 3) - 1;
+    aux.x = abeja.x + (rand() % 3) - 1;
+    aux.y = abeja.y + (rand() % 3) - 1;
 
-    // voy a hacer un if q si aux en calleLimit es un # entonces retrun e
+    // voy a hacer un if q si aux en calleLimit es un # entonces retrun abeja
     if(limit[max - aux.y][aux.x] == '#') {
-        return e;
+        return abeja;
     } else {
         return aux;
     }

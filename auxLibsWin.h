@@ -320,3 +320,7 @@ void cls() {
 //     }
 // 		printf("\e[%iA", 100);
 // }
+
+// velocity es muy importante para ajustar la velocidad del juego segun el sistema operativo donde se corre.
+//  
+#define velocity 1
