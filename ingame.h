@@ -14,8 +14,15 @@ coor curas;
 // Matrices que guardan las escenas
 char escCasa[max][max2];
 char escCasaLimit[max][max2];
-char escCalle[max][max2];
-char escCalleLimit[max][max2];
+
+// char escCalle[max][max2];
+// char escCalleLimit[max][max2];
+typedef struct {
+	char escVisual[max][max2];
+	char escLimit[max][max2];
+} escCollection;
+escCollection listaDeEscenas[5];
+
 char escVecino[max][max2];
 char escVecinoLimit[max][max2];
 
@@ -139,6 +146,14 @@ void playGame(Player *actualGame){
 	/**/ entyCoor[12] = (coor){31, 13};		//vecino 2
 	/**/ entyCoor[13] = (coor){41, 13};		//vecino 3
 	/**/ entyCoor[14] = (coor){31, 12};		//vecino 4
+	////////////////////////////////////////////////////////////////
+
+	/////////////////CARGA INICIAL DE ESCENAS/////////////////////
+	/**/cargarEscenas(listaDeEscenas[0].escVisual, listaDeEscenas[0].escLimit, 1);
+	/**/cargarEscenas(listaDeEscenas[1].escVisual, listaDeEscenas[1].escLimit, 35);
+	/**/cargarEscenas(listaDeEscenas[2].escVisual, listaDeEscenas[2].escLimit, 69);
+	/**/cargarEscenas(listaDeEscenas[3].escVisual, listaDeEscenas[3].escLimit, 103);
+	/**/cargarEscenas(listaDeEscenas[4].escVisual, listaDeEscenas[4].escLimit, 137);
 	////////////////////////////////////////////////////////////////
 
 	// // Cinematica al inicio del juego.
@@ -361,26 +376,26 @@ int menuDeCalle (){
 
 
 	// CARGA LA CALLE A LA QUE LLEGASTE
-	switch (noviaDeLisa.calleLoc){
-		case 1:
-			cargarEscenas(escCalle, escCalleLimit, 35);
-			break;
+	// switch (noviaDeLisa.calleLoc){
+	// 	case 1:
+	// 		cargarEscenas(escCalle, escCalleLimit, 35);
+	// 		break;
 
-		case 2:
-			cargarEscenas(escCalle, escCalleLimit, 69);
-			break;
+	// 	case 2:
+	// 		cargarEscenas(escCalle, escCalleLimit, 69);
+	// 		break;
 
-		case 3:
-			cargarEscenas(escCalle, escCalleLimit, 103);
-			break;
+	// 	case 3:
+	// 		cargarEscenas(escCalle, escCalleLimit, 103);
+	// 		break;
 
-		case 4:
-			cargarEscenas(escCalle, escCalleLimit, 137);
-			break;	
+	// 	case 4:
+	// 		cargarEscenas(escCalle, escCalleLimit, 137);
+	// 		break;	
 
-		default:
-			break;
-	}
+	// 	default:
+	// 		break;
+	// }
 
 	//	REINICIA UBI DE ABEJAS CADA QUE LLEGAS A LA CALLE
 	// 		INCLUSO CUANDO CAMBIAS DE CALLE 
@@ -388,19 +403,19 @@ int menuDeCalle (){
 	/**/ entyCoor[2] = (coor){18, 11};	//abeja 2
 	/**/ entyCoor[3] = (coor){45, 5};	//abeja 3
 	
-	int estadoEnCalle = dibujarEscena(escCalle, 2);
+	int estadoEnCalle = dibujarEscena(listaDeEscenas[noviaDeLisa.calleLoc].escVisual, 2);
 	char calleInput;
 
 	do{
-		estadoEnCalle = dibujarEscena(escCalle, 2);
+		estadoEnCalle = dibujarEscena(listaDeEscenas[noviaDeLisa.calleLoc].escVisual, 2);
 
 		ndlDataDebug(&noviaDeLisa);
 
 		switch(estadoEnCalle){
 			case 0:
-				entyCoor[1] = randomUbi(entyCoor[1], escCalleLimit);
-				entyCoor[2] = randomUbi(entyCoor[2], escCalleLimit);
-				entyCoor[3] = randomUbi(entyCoor[3], escCalleLimit);
+				entyCoor[1] = randomUbi(entyCoor[1], listaDeEscenas[noviaDeLisa.calleLoc].escLimit);
+				entyCoor[2] = randomUbi(entyCoor[2], listaDeEscenas[noviaDeLisa.calleLoc].escLimit);
+				entyCoor[3] = randomUbi(entyCoor[3], listaDeEscenas[noviaDeLisa.calleLoc].escLimit);
 				break;
 
 			// ENTRAR A CASA POR PUERTA
@@ -462,8 +477,19 @@ int menuDeCalle (){
 		        
 		        break;
 
-			// CAMBIO DE CALLE
+			// CAMBIO DE CALLE (DERECHA)
 			case 4:
+				cambiarCalleAnim(listaDeEscenas[noviaDeLisa.calleLoc].escVisual, listaDeEscenas[noviaDeLisa.calleLoc+1].escVisual, 'd');
+				noviaDeLisa.calleLoc++;
+				noviaDeLisa.ubi.x = 1;
+				return 2;
+				break;
+
+			// CAMBIO DE CALLE (IZQUIERDA)
+			case 5:
+				cambiarCalleAnim(listaDeEscenas[noviaDeLisa.calleLoc].escVisual, listaDeEscenas[noviaDeLisa.calleLoc-1].escVisual, 'i');
+				noviaDeLisa.calleLoc--;
+				noviaDeLisa.ubi.x = 59;
 				return 2;
 				break;
 				
@@ -478,7 +504,7 @@ int menuDeCalle (){
 			return 6;		
 
 		// MOVIMIENTO DE noviaDeLisa
-		noviaDeLisa.ubi = movimientoConInput(calleInput, noviaDeLisa.ubi, escCalleLimit, 1);
+		noviaDeLisa.ubi = movimientoConInput(calleInput, noviaDeLisa.ubi, listaDeEscenas[noviaDeLisa.calleLoc].escLimit, 1);
 		
 	}while(estadoEnCalle != 6);
 }
@@ -1193,9 +1219,7 @@ int dibujarEscena(char d[max][max2], int loc){
 			// 	ESTO ES PARA PASAR DE CALLE
 			// 		AVANZAR DE CALLE
 			if(noviaDeLisa.ubi.x > 59){
-				noviaDeLisa.calleLoc++;
 				// if(noviaDeLisa.calleLoc <= noviaDeLisa.misionesCumplidas + 1){		//todo lo comentado funciona, esta comentado para poder testear cosas en el mapa
-					noviaDeLisa.ubi.x = 1;
 					return 4;
 				// } else {
 				// 	noviaDeLisa.ubi.x = noviaDeLisa.ubi.x - 2;
@@ -1205,10 +1229,8 @@ int dibujarEscena(char d[max][max2], int loc){
             
 			// 		VOLVER UNA CALLE
 			if(noviaDeLisa.ubi.x < 1){
-				noviaDeLisa.calleLoc--;
 				// if (noviaDeLisa.calleLoc >= 1){		//todo lo comentado funciona, esta comentado para poder testear cosas en el mapa
-					noviaDeLisa.ubi.x = 59;
-					return 4;
+					return 5;
 				// } else {
 				// 	noviaDeLisa.ubi.x = noviaDeLisa.ubi.x + 2;
 				// 	noviaDeLisa.calleLoc++;

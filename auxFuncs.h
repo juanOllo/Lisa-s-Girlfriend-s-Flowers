@@ -43,6 +43,7 @@ typedef struct {
 // No es necesario pero las defino aca para encontrarlas mas rapido
 void actualizarHP(int hp);  
 void actualizarMenuVecino(int vecinoFocusOption);
+void cambiarCalleAnim(char escena[max][max2], char escena2[max][max2], char direccion);
 void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], int l);
 void guardarPartida(Player *ndl, int typeSave);
 void leerEscuchar(int cont);
@@ -187,6 +188,72 @@ void actualizarMenuVecino(int vecinoFocusOption){
             break;
     }
     printf("\e[%iA", 4);
+}
+
+
+
+
+void cambiarCalleAnim(char escena[max][max2], char escena2[max][max2], char direccion){
+    // El pivote ya va a estar ubicado por primera vez
+	// printf("\e[%iA", 15);
+
+    int k = 1;
+
+    switch (direccion){
+        // DERECHA
+        case 'd':
+            while (k < max2-1){
+                
+                for(int i = max-1; i > 1; i--){
+                    printf("                              ");
+                    for(int j = k; j < max2-1; j++){
+                        printf("%c", escena[max-i][j]);
+                    }
+
+                    for (int d = 1; d < (k+1); d++){
+                        printf("%c", escena2[max-i][d]);
+                    }
+
+                    // El ' ' en el printf es para borrar la flor q se buguea a la derecha de la escena de la calle.
+                    printf(" \n");
+                }
+                printf("\e[%iA", 15);
+
+                k++;
+            }
+            break;
+
+        // IZQUIERDA
+        case 'i':
+            while (k < max2-2){
+                
+                for(int i = max-1; i > 1; i--){
+                    printf("                              ");
+                    // Escena a la q voy
+                    for (int d = ((max2-2)-k); d < (max2-1); d++){
+                        printf("%c", escena2[max-i][d]);
+                    }
+
+                    // Escena en la q estoy
+                    for(int j = 1; j < (max2-2-k); j++){
+                        printf("%c", escena[max-i][j]);
+                    }
+
+                    // El ' ' en el printf es para borrar la flor q se buguea a la derecha de la escena de la calle.
+                    printf(" \n");
+                }
+                printf("\e[%iA", 15);
+
+                k++;
+            }
+            break;
+        
+        default:
+            break;
+    }
+
+    
+    
 }
 
 
