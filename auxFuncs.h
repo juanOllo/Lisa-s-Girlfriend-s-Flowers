@@ -45,6 +45,7 @@ void actualizarHP(int hp);
 void actualizarMenuVecino(int vecinoFocusOption);
 void cambiarCalleAnim(char escena[max][max2], char escena2[max][max2], char direccion);
 void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], int l);
+void cargarEscenasConAlternativa(char escenaVisual[max][max2], char escenaVisualAlternativa[max][max2], char escenaLimites[max][max2], int l);
 void guardarPartida(Player *ndl, int typeSave);
 void leerEscuchar(int cont);
 void matrisDebug(char matris[max][max2]);
@@ -192,10 +193,10 @@ void actualizarMenuVecino(int vecinoFocusOption){
 
 
 
-
+                    //                                                  'i' = izquierda
+                    // Escena actual            Escena a la q vas       'd' = derecha
 void cambiarCalleAnim(char escena[max][max2], char escena2[max][max2], char direccion){
-    // El pivote ya va a estar ubicado por primera vez
-	// printf("\e[%iA", 15);
+	printf("\e[%iA", 15);
 
     int k = 1;
 
@@ -283,6 +284,57 @@ void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], 
         for (i = 0; i < max; i++){
             for(j = 0; j < max2; j++){
                 fscanf(f, "%c", &escenaVisual[i][j]);
+            }
+            fscanf(f, "%c", &aux);
+        }
+
+        // Carga la escena que va a marcar los limites.
+        for (i = 0; i <= max; i++){
+            for(j = 0; j < max2; j++){
+                fscanf(f, "%c", &escenaLimites[i][j]);
+            }
+            fscanf(f, "%c", &aux);
+        }
+		
+    } else {
+        printf("error");
+    }
+
+	fclose(f);
+}
+
+
+
+
+void cargarEscenasConAlternativa(char escenaVisual[max][max2], char escenaVisualAlternativa[max][max2], char escenaLimites[max][max2], int l){
+    FILE *f;
+    int i = 0;
+    int j = 0;
+    char aux;
+    char linea[max2+2];
+    
+    f = fopen("escenas.txt", "r");
+    
+    while(i < l-1){
+        fscanf(f, "%c", &aux);
+        fgets(linea, sizeof(linea), f);
+        i++;
+    }
+    
+    if(f != NULL){
+
+        // Carga la escena que se va a mostrar en pantalla.
+        for (i = 0; i < max; i++){
+            for(j = 0; j < max2; j++){
+                fscanf(f, "%c", &escenaVisual[i][j]);
+            }
+            fscanf(f, "%c", &aux);
+        }
+
+        // Carga la escena que se va a alternar visualmente con la primera.
+        for (i = 0; i < max; i++){
+            for(j = 0; j < max2; j++){
+                fscanf(f, "%c", &escenaVisualAlternativa[i][j]);
             }
             fscanf(f, "%c", &aux);
         }
@@ -542,12 +594,12 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
                     case 'd':
                     case 'D':
                     case 'M':
-                        nuevaUbiAux.x = nuevaUbiAux.x + 3;
+                        nuevaUbiAux.x = nuevaUbiAux.x + 2;
                         break;
                     case 'a':
                     case 'A':
                     case 'K':
-                        nuevaUbiAux.x = nuevaUbiAux.x - 3;
+                        nuevaUbiAux.x = nuevaUbiAux.x - 2;
                         break;
                     case 'w':
                     case 'W':

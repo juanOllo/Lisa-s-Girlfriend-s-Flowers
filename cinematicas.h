@@ -83,7 +83,7 @@ void cinematica(int l/*line*/, int mss){
 
 
 
-//  PAUSA LA PANTALLA s MILISEGUNDOS
+//  PAUSA LA PANTALLA ms MILISEGUNDOS
 void freeze_ms(int ms) {
     clock_t start_time = clock();
     clock_t wait_time = ms * (CLOCKS_PER_SEC / 1000);
