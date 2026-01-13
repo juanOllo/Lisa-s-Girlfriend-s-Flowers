@@ -52,6 +52,7 @@ void matrisDebug(char matris[max][max2]);
 coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
 coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
 int proximo(coor u, coor e);
+int proximoAbeja(coor ndl, coor abeja);
 coor randomUbi(coor e, char limit[max][max2]);
 void ubicarPivote();
 
@@ -703,6 +704,18 @@ int proximo(coor u, coor e){
 
     if((e.x+2>u.x && u.x>e.x-2) && (e.y+2>u.y && u.y>e.y-2))
         return 1; //U está en el area de e
+
+    return 0; //No están ni cerca
+}
+
+
+
+
+// CHECKEA SI ESTA EN EL AREA DE UNA ABEJA 
+int proximoAbeja(coor ndl, coor abeja){
+
+    if((abeja.x-1 <= ndl.x && abeja.x+3 >= ndl.x) && (abeja.y+1 >= ndl.y && abeja.y-2 <= ndl.y))
+        return 1; //ndl está en el area de la abeja
 
     return 0; //No están ni cerca
 }
