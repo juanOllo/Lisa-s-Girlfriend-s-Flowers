@@ -48,7 +48,6 @@ void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], 
 void cargarEscenasConAlternativa(char escenaVisual[max][max2], char escenaVisualAlternativa[max][max2], char escenaLimites[max][max2], int l);
 void guardarPartida(Player *ndl, int typeSave);
 void leerEscuchar(int cont);
-void matrisDebug(char matris[max][max2]);
 coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
 coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
 int proximo(coor u, coor e);
@@ -56,74 +55,22 @@ int proximoAbeja(coor ndl, coor abeja);
 coor randomUbi(coor e, char limit[max][max2]);
 void ubicarPivote();
 
+// Funciones solo para debuguear
+void debugString(char errorMsj[100]);
+void debugStringInt(char msj[100], int a);
+void debugChar(char a);
+void debugEscena(char escena[max][max2]);
+void debugNdlData(Player *ndl);
 
 
 
-// Esta funcion esta arriba siempre porq la uso solo para debuggear y suelo cambiar el perfil y parametros.
-void error1(char errorMsj[100]){
-    FILE *errors;
-	errors = fopen("errors.txt", "a");
-	fprintf(errors, errorMsj);
-	fprintf(errors, "\n");
-	fclose(errors);
-}
 
-void error2(char msj[100], int a){
-    FILE *errors;
 
-	errors = fopen("errors.txt", "a");
-	fprintf(errors, "%s %d", msj, a);
-	fprintf(errors, "\n");
-	fclose(errors);
-}
 
-void error3(char a){
-    FILE *errors;
-	errors = fopen("errors.txt", "a");
-	fprintf(errors, "%c", a);
-	fprintf(errors, "\n");
-	fclose(errors);
-}
 
-void debugEscena(char escena[max][max2]){
-    FILE *errors;
-    errors = fopen("errors.txt", "a");
 
-    char *escenaFila[max2];
 
-    for(int i = 0; i < max; i++){
 
-        // escenaFila = &escena[0][i];
-        escenaFila[0] = &escena[i][0];
-
-        fprintf(errors, "%.62s", escenaFila[0]);
-        fprintf(errors, "\n");
-    }
-
-    fclose(errors);
-}
-
-void ndlDataDebug(Player *ndl){
-    FILE *errors;
-
-	// errors = fopen("errors.txt", "a");
-	errors = fopen("errors.txt", "w");  // Modo "w" sobrescribe el archivo
-
-	fprintf(errors, "%s %d \n", "cantFlores:        ", ndl->cantFlores);
-	fprintf(errors, "%s %d \n", "misionesCumplidas: ", ndl->misionesCumplidas);
-	fprintf(errors, "%s %d \n", "primeraVez:        ", ndl->primeraVez);
-	fprintf(errors, "%s %d \n", "lucides[0]:        ", ndl->lucides[0]);
-	fprintf(errors, "%s %d \n", "lucides[1]:        ", ndl->lucides[1]);
-	fprintf(errors, "%s %d \n", "lucides[2]:        ", ndl->lucides[2]);
-	fprintf(errors, "%s %d \n", "lucides[3]:        ", ndl->lucides[3]);
-	fprintf(errors, "%s %d \n", "hp:                ", ndl->hp);
-	fprintf(errors, "%s %d \n", "ubi x:             ", ndl->ubi.x);
-	fprintf(errors, "%s %d \n", "ubi y:             ", ndl->ubi.y);
-	fprintf(errors, "%s %d \n", "calleLoc:          ", ndl->calleLoc);
-    
-	// fprintf(errors, "\n");
-	fclose(errors);
-}
 
 
 
@@ -307,6 +254,9 @@ void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], 
 
 
 
+// CARGA 3 MATRIZES CON ESCENAS DEL DOCUMENTO escenas.txt 
+//  COMENZANDO EN LA LINEA l
+//  CARGA LAS 2 ESCENAS QUE SE ALTERNAN EN PANTALLA Y LA QUE MARCA LOS LIMITES
 void cargarEscenasConAlternativa(char escenaVisual[max][max2], char escenaVisualAlternativa[max][max2], char escenaLimites[max][max2], int l){
     FILE *f;
     int i = 0;
@@ -459,28 +409,6 @@ void leerEscuchar(int cont){
 	printf("\t%s\n", dialogo);
 	//printf("\nTermina escuchar.\n");
 
-}
-
-
-
-
-void matrisDebug(char matris[max][max2]){
-
-    FILE *errors;
-	errors = fopen("errors.txt", "a");
-
-    char *matrisFila[max2];
-
-    for(int i = 0; i<20; i++){
-
-        // matrisFila = &matris[0][i];
-        matrisFila[0] = &matris[i][0];
-
-        fprintf(errors, matrisFila[0]);
-        fprintf(errors, "\n");
-    }
-
-	fclose(errors);
 }
 
 
@@ -645,6 +573,36 @@ coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][ma
         isOk = 1;
 
         switch (casaOCalle){
+
+            case 5:
+                switch (input){
+                    case 'd':
+                    case 'D':
+                    case 'M':
+                        nuevaUbiAux.x = nuevaUbiAux.x + 2;
+                        break;
+                    case 'a':
+                    case 'A':
+                    case 'K':
+                        nuevaUbiAux.x = nuevaUbiAux.x - 2;
+                        break;
+                    case 'w':
+                    case 'W':
+                    case 'H':
+                        nuevaUbiAux.y = nuevaUbiAux.y + 1;
+                        break;
+                    case 's':
+                    case 'S':
+                    case 'P':
+                        nuevaUbiAux.y = nuevaUbiAux.y - 1;
+                        break;
+                    // case '.':
+                    //     break;
+                    default:
+                        break;
+                }
+            break;
+            
             default:
                 switch (input){
                     case 'd':
@@ -682,7 +640,6 @@ coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][ma
 
     if(movimientoLimit[max - nuevaUbiAux.y][nuevaUbiAux.x] == '#') {
         return actualUbi;
-        
     } else {
         return nuevaUbiAux;
     }
@@ -693,14 +650,9 @@ coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][ma
 
 // CHECKEA EL ESTADO ENTRE LAS DOS UBICACIONES 
 int proximo(coor u, coor e){
-    
-    // es e.x+"4" porq lo hice pensando en el tamaño de las abejas creo
-    //  capaz haya q cambiarlo si lo voy a usar para algo mas al return 2
+
     if(e.x==u.x && e.y==u.y)
         return 2; //Están en el mismo lugar 
-
-    // if((e.x+4>u.x && u.x>e.x-2) && (e.y+2>u.y && u.y>e.y-2))
-    //     return 1; //U está en el area de e
 
     if((e.x+2>u.x && u.x>e.x-2) && (e.y+2>u.y && u.y>e.y-2))
         return 1; //U está en el area de e
@@ -714,7 +666,7 @@ int proximo(coor u, coor e){
 // CHECKEA SI ESTA EN EL AREA DE UNA ABEJA 
 int proximoAbeja(coor ndl, coor abeja){
 
-    if((abeja.x-1 <= ndl.x && abeja.x+3 >= ndl.x) && (abeja.y+1 >= ndl.y && abeja.y-2 <= ndl.y))
+    if((abeja.x-1 <= ndl.x && abeja.x+3 >= ndl.x) && (abeja.y+1 >= ndl.y && abeja.y-1 <= ndl.y))
         return 1; //ndl está en el area de la abeja
 
     return 0; //No están ni cerca
@@ -723,19 +675,19 @@ int proximoAbeja(coor ndl, coor abeja){
 
 
 
-//  DEVUELVE UNA UBI RANDOM DENTRO DE LOS LIMITES
+// DEVUELVE UNA UBI RANDOM DENTRO DE LOS LIMITES
 coor randomUbi(coor abeja, char limit[max][max2]){ 
 	// srand(time(NULL));//Sirve para q rand() no de siempre los mismos numeros randoms
-    coor aux;
+    coor nuevaUbi;
     
-    aux.x = abeja.x + (rand() % 3) - 1;
-    aux.y = abeja.y + (rand() % 3) - 1;
+    nuevaUbi.x = abeja.x + (rand() % 3) - 1;
+    nuevaUbi.y = abeja.y + (rand() % 3) - 1;
 
-    // voy a hacer un if q si aux en calleLimit es un # entonces retrun abeja
-    if(limit[max - aux.y][aux.x] == '#') {
+    // si nuevaUbi en calleLimit es un # entonces retrun abeja
+    if(limit[max - nuevaUbi.y][nuevaUbi.x] == '#') {
         return abeja;
     } else {
-        return aux;
+        return nuevaUbi;
     }
 
 }
@@ -744,6 +696,7 @@ coor randomUbi(coor abeja, char limit[max][max2]){
 
 
 void ubicarPivote(){
+    // Vuelve al comienzo del terminal
 	printf("\e[%iA", 100);
 
     // Margin top
@@ -751,4 +704,98 @@ void ubicarPivote(){
 
     // Altura de los frames.
     printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Estas funciones son solo para debuguear. //
+void debugString(char errorMsj[100]){
+    FILE *errors;
+	errors = fopen("errors.txt", "a");
+	fprintf(errors, errorMsj);
+	fprintf(errors, "\n");
+	fclose(errors);
+}
+
+void debugStringInt(char msj[100], int a){
+    FILE *errors;
+
+	errors = fopen("errors.txt", "a");
+	fprintf(errors, "%s %d", msj, a);
+	fprintf(errors, "\n");
+	fclose(errors);
+}
+
+void debugChar(char a){
+    FILE *errors;
+	errors = fopen("errors.txt", "a");
+	fprintf(errors, "%c", a);
+	fprintf(errors, "\n");
+	fclose(errors);
+}
+
+void debugStringCoor(char msj[100], coor ubi){
+    FILE *errors;
+
+	errors = fopen("errors.txt", "a");
+	fprintf(errors, "%s : %d %d", msj, ubi.x, ubi.y);
+	fprintf(errors, "\n");
+	fclose(errors);
+}
+
+void debugEscena(char escena[max][max2]){
+    FILE *errors;
+    errors = fopen("errors.txt", "a");
+
+    char *escenaFila[max2];
+
+    for(int i = 0; i < max; i++){
+
+        // escenaFila = &escena[0][i];
+        escenaFila[0] = &escena[i][0];
+
+        fprintf(errors, "%.62s", escenaFila[0]);
+        fprintf(errors, "\n");
+    }
+
+    fclose(errors);
+}
+
+void debugNdlData(Player *ndl){
+    FILE *errors;
+
+	// errors = fopen("errors.txt", "a");
+	errors = fopen("errors.txt", "w");  // Modo "w" sobrescribe el archivo
+
+	fprintf(errors, "%s %d \n", "cantFlores:        ", ndl->cantFlores);
+	fprintf(errors, "%s %d \n", "misionesCumplidas: ", ndl->misionesCumplidas);
+	fprintf(errors, "%s %d \n", "primeraVez:        ", ndl->primeraVez);
+	fprintf(errors, "%s %d \n", "lucides[0]:        ", ndl->lucides[0]);
+	fprintf(errors, "%s %d \n", "lucides[1]:        ", ndl->lucides[1]);
+	fprintf(errors, "%s %d \n", "lucides[2]:        ", ndl->lucides[2]);
+	fprintf(errors, "%s %d \n", "lucides[3]:        ", ndl->lucides[3]);
+	fprintf(errors, "%s %d \n", "hp:                ", ndl->hp);
+	fprintf(errors, "%s %d \n", "ubi x:             ", ndl->ubi.x);
+	fprintf(errors, "%s %d \n", "ubi y:             ", ndl->ubi.y);
+	fprintf(errors, "%s %d \n", "calleLoc:          ", ndl->calleLoc);
+    
+	// fprintf(errors, "\n");
+	fclose(errors);
 }

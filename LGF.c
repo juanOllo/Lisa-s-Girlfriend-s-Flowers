@@ -55,7 +55,7 @@ int main() {
 			case '1':
 				// COMENZAR A JUGAR
 				cls();
-                playGame(&actualGame);
+                startGame(&actualGame);
 				op = 7;
 				break;
 				
@@ -111,7 +111,7 @@ int main() {
 			case '1':
 				// COMENZAR A JUGAR
 				cls();
-                playGame(&actualGame);
+                startGame(&actualGame);
 				break;
 				
 			case '2':
