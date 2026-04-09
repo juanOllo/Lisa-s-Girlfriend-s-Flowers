@@ -36,7 +36,7 @@ int dibujarEscena(char d[max][max2], int loc);
 
 //lo uso para cargar la data guardada en el pj
 //	deberia estar en el main pero para eso tengo q arreglar el tema de los punteros
-char saveArray[16];
+char saveArray[18];
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,13 +119,15 @@ void startGame(Player *actualGame){
 			/**/ 	noviaDeLisa.lucides[ini] = atoi(&cAux);
 			/**/ }
 			/**/
-			/**/ noviaDeLisa.hp = atoi(&saveArray[7]) / 100000;
+			/**/ noviaDeLisa.hp = atoi(&saveArray[7]) / 10000000;
 			/**/
-			/**/ noviaDeLisa.ubi.x = atoi(&saveArray[10]) / 1000;
-			/**/ noviaDeLisa.ubi.y = atoi(&saveArray[12]) / 10;	
+			/**/ noviaDeLisa.ubi.x = atoi(&saveArray[10]) / 100000;
+			/**/ noviaDeLisa.ubi.y = atoi(&saveArray[12]) / 1000;	
 			/**/
 			/**/ cAux = saveArray[14];
 			/**/ noviaDeLisa.calleLoc = atoi(&cAux);
+			/**/
+			/**/ noviaDeLisa.colorL = atoi(&saveArray[15]);
 			////////////////////////////////////////////////////////////////
 		}
 
@@ -143,6 +145,7 @@ void startGame(Player *actualGame){
 		/**/ }
 		/**/ noviaDeLisa.ubi = (coor){31, 7};	//noviaDeLisa por primera vez en el juego
 		/**/ noviaDeLisa.calleLoc = 0;
+		/**/ noviaDeLisa.colorL = 37;
 		////////////////////////////////////////////////////////////////
 		
 		guardarPartida(&noviaDeLisa, 0); // Guardo la partida inicial automaticamente
@@ -1171,10 +1174,8 @@ int dibujarEscena(char d[max][max2], int loc){
 						j = j + 2;
 
                     }else if(i == noviaDeLisa.ubi.y && j == noviaDeLisa.ubi.x){
-                        printf("L");
-						// printf("\033[32;43mL\033[0m");
-						// printf("\033[32mL\033[0m");
-						// printf("\033[34;43mA\033[0m");
+                        // printf("L");
+						printNdl(noviaDeLisa.colorL);
 						if(noviaDeLisa.cantFlores > 0){
 							printf("*"); 
 							j++;
@@ -1226,7 +1227,8 @@ int dibujarEscena(char d[max][max2], int loc){
 							j = j+2;
 	
 						}else if((j == noviaDeLisa.ubi.x) && (i == noviaDeLisa.ubi.y) && impactoConEntidad == 0){
-							printf("L*");
+							printNdl(noviaDeLisa.colorL);
+							printf("*");
 							j++;
 	
 						} else{
@@ -1280,7 +1282,8 @@ int dibujarEscena(char d[max][max2], int loc){
 						j = j+2;
 						
 					}else if((j == noviaDeLisa.ubi.x) && (i == noviaDeLisa.ubi.y)){
-                        printf("L*");
+						printNdl(noviaDeLisa.colorL);
+                        printf("*");
 						j++;
 						
                     } else{
@@ -1302,7 +1305,8 @@ int dibujarEscena(char d[max][max2], int loc){
 				
                 for(int j = 1; j < max2-1; j++){
 					if((j == noviaDeLisa.ubi.x) && (i == noviaDeLisa.ubi.y)){
-						printf("L*");
+						printNdl(noviaDeLisa.colorL);
+						printf("*");
 						j++;
 
                     } else{

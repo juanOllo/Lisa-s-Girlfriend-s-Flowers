@@ -37,6 +37,7 @@ typedef struct {
 	int lucides[4];         // guarda las veces q gastaste todos los dialogos a cada vecino
 	coor ubi;               // ubicacion actual de ndl
 	int calleLoc;           // en que seccion del juego se encuentra ndl
+    int colorL;
 } Player;
 
 
@@ -50,6 +51,7 @@ void guardarPartida(Player *ndl, int typeSave);
 void leerEscuchar(int cont);
 coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
 coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
+void printNdl(int colorL);
 int proximo(coor u, coor e);
 int proximoAbeja(coor ndl, coor abeja);
 coor randomUbi(coor e, char limit[max][max2]);
@@ -313,7 +315,7 @@ void cargarEscenasConAlternativa(char escenaVisual[max][max2], char escenaVisual
 //          = 1 para guardado manual
 void guardarPartida(Player *ndl, int typeSabe){
 
-    char toSaveArray[16];
+    char toSaveArray[18];
 
     sprintf(&toSaveArray[0], "%d", ndl->cantFlores);
     
@@ -363,6 +365,8 @@ void guardarPartida(Player *ndl, int typeSabe){
     }
 
     sprintf(&toSaveArray[14], "%d", ndl->calleLoc);
+
+    sprintf(&toSaveArray[15], "%d", ndl->colorL);
 
     // Guardo la informacion de toSaveArray en save.txt
     FILE *save;
@@ -648,6 +652,13 @@ coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][ma
 
 
 
+void printNdl(int colorL){
+    printf("\033[%dmL\033[0m", colorL);
+}
+
+
+
+
 // CHECKEA EL ESTADO ENTRE LAS DOS UBICACIONES 
 int proximo(coor u, coor e){
 
@@ -795,6 +806,7 @@ void debugNdlData(Player *ndl){
 	fprintf(errors, "%s %d \n", "ubi x:             ", ndl->ubi.x);
 	fprintf(errors, "%s %d \n", "ubi y:             ", ndl->ubi.y);
 	fprintf(errors, "%s %d \n", "calleLoc:          ", ndl->calleLoc);
+	fprintf(errors, "%s %d \n", "colorL:            ", ndl->colorL);
     
 	// fprintf(errors, "\n");
 	fclose(errors);
