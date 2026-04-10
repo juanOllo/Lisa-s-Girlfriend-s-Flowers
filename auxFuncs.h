@@ -317,6 +317,18 @@ void guardarPartida(Player *ndl, int typeSabe){
 
     char toSaveArray[18];
 
+    // Asi guardo solo el color de ndl
+    if (typeSabe == 2){
+        FILE *save;
+        save = fopen("save.txt", "r+");
+
+        // Nueve el puntero dos caracteres antes del final
+        fseek(save, -2, SEEK_END);
+        fprintf(save, "%d", ndl->colorL);
+        fclose(save);
+        return;
+    }
+
     sprintf(&toSaveArray[0], "%d", ndl->cantFlores);
     
     sprintf(&toSaveArray[1], "%d", ndl->misionesCumplidas);
@@ -439,22 +451,22 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
                 switch (input){
                     case 'd':
                     case 'D':
-                    case 'M':
+                    case 77:
                         nuevaUbiAux.x = nuevaUbiAux.x + (3 - casaOCalle);
                         break;
                     case 'a':
                     case 'A':
-                    case 'K':
+                    case 75:
                         nuevaUbiAux.x = nuevaUbiAux.x - (3 - casaOCalle);
                         break;
                     case 'w':
                     case 'W':
-                    case 'H':
+                    case 72:
                         nuevaUbiAux.y = nuevaUbiAux.y + 1;
                         break;
                     case 's':
                     case 'S':
-                    case 'P':
+                    case 80:
                         nuevaUbiAux.y = nuevaUbiAux.y - 1;
                         break;
                     // case '.':
@@ -468,22 +480,22 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
                 switch (input){
                     case 'd':
                     case 'D':
-                    case 'M':
+                    case 77:
                         nuevaUbiAux.x = nuevaUbiAux.x + 2;
                         break;
                     // case 'a':
                     // case 'A':
-                    // case 'K':
+                    // case 75:
                     //     nuevaUbiAux.x = nuevaUbiAux.x - 2;
                     //     break;
                     case 'w':
                     case 'W':
-                    case 'H':
+                    case 72:
                         nuevaUbiAux.y = nuevaUbiAux.y + 2;
                         break;
                     case 's':
                     case 'S':
-                    case 'P':
+                    case 80:
                         nuevaUbiAux.y = nuevaUbiAux.y - 2;
                         break;
                     // case '.':
@@ -497,22 +509,22 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
                 switch (input){
                     case 'd':
                     case 'D':
-                    case 'M':
+                    case 77:
                         nuevaUbiAux.x = nuevaUbiAux.x + 5;
                         break;
                     case 'a':
                     case 'A':
-                    case 'K':
+                    case 75:
                         nuevaUbiAux.x = nuevaUbiAux.x - 5;
                         break;
                     case 'w':
                     case 'W':
-                    case 'H':
+                    case 72:
                         nuevaUbiAux.y = nuevaUbiAux.y + 2;
                         break;
                     case 's':
                     case 'S':
-                    case 'P':
+                    case 80:
                         nuevaUbiAux.y = nuevaUbiAux.y - 2;
                         break;
                     // case '.':
@@ -526,22 +538,22 @@ coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle
                 switch (input){
                     case 'd':
                     case 'D':
-                    case 'M':
+                    case 77:
                         nuevaUbiAux.x = nuevaUbiAux.x + 2;
                         break;
                     case 'a':
                     case 'A':
-                    case 'K':
+                    case 75:
                         nuevaUbiAux.x = nuevaUbiAux.x - 2;
                         break;
                     case 'w':
                     case 'W':
-                    case 'H':
+                    case 72:
                         nuevaUbiAux.y = nuevaUbiAux.y + 1;
                         break;
                     case 's':
                     case 'S':
-                    case 'P':
+                    case 80:
                         nuevaUbiAux.y = nuevaUbiAux.y - 1;
                         break;
                     // case '.':
@@ -582,22 +594,22 @@ coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][ma
                 switch (input){
                     case 'd':
                     case 'D':
-                    case 'M':
+                    case 77:
                         nuevaUbiAux.x = nuevaUbiAux.x + 2;
                         break;
                     case 'a':
                     case 'A':
-                    case 'K':
+                    case 75:
                         nuevaUbiAux.x = nuevaUbiAux.x - 2;
                         break;
                     case 'w':
                     case 'W':
-                    case 'H':
+                    case 72:
                         nuevaUbiAux.y = nuevaUbiAux.y + 1;
                         break;
                     case 's':
                     case 'S':
-                    case 'P':
+                    case 80:
                         nuevaUbiAux.y = nuevaUbiAux.y - 1;
                         break;
                     // case '.':
@@ -611,22 +623,22 @@ coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][ma
                 switch (input){
                     case 'd':
                     case 'D':
-                    case 'M':
+                    case 77:
                         nuevaUbiAux.x = nuevaUbiAux.x + (3 - casaOCalle);
                         break;
                     case 'a':
                     case 'A':
-                    case 'K':
+                    case 75:
                         nuevaUbiAux.x = nuevaUbiAux.x - (3 - casaOCalle);
                         break;
                     case 'w':
                     case 'W':
-                    case 'H':
+                    case 72:
                         nuevaUbiAux.y = nuevaUbiAux.y + 1;
                         break;
                     case 's':
                     case 'S':
-                    case 'P':
+                    case 80:
                         nuevaUbiAux.y = nuevaUbiAux.y - 1;
                         break;
                     case '.':

@@ -49,7 +49,7 @@ volatile int impactoConEntidad = 0;		// Representa si hubo impacto/contacto con 
 volatile bool seguirDibujando = true;	// Variable para controlar el bucle de dibujo en los threads
 
 //	Utilizadas solo en menuCalle()
-	volatile int timeChange = 0;
+	volatile bool timeChange = true;
 	
 // 	Utilizadas solo en vecinoGameplay()
 	// Obstaculos del juego de 1er vecino
@@ -364,10 +364,15 @@ int menuDeCalle (){
 	pthread_t hiloAbejas;
 
 	pthread_create(&hiloDibujoCalle, NULL, threadDibujoCalle, &loc2);
-	pthread_create(&hiloTimeChange, NULL, threadTimeChange, &loc2);
 	
-	// Inicia el thread de las abejas solo si estas en la calle con ellas
-	if (noviaDeLisa.calleLoc == noviaDeLisa.misionesCumplidas){
+	// Si no deberia haber abejas inicia solo el hilo del timeChange
+	// 	así tengo solo dos hilos en ejecucion en la calle
+	if (noviaDeLisa.calleLoc != noviaDeLisa.misionesCumplidas){
+		pthread_create(&hiloTimeChange, NULL, threadTimeChange, &loc2);
+
+	// Sino inicia el thread de las abejas
+	// 	(este hilo tambien modifica el timeChange)
+	} else {
 		pthread_create(&hiloAbejas, NULL, threadActualizarCoorAbejas, &loc2);
 
 		//	REINICIA UBI DE ABEJAS CADA QUE LLEGAS A LA CALLE
@@ -375,6 +380,8 @@ int menuDeCalle (){
 		entyCoor[2] = (coor){18, 11};	//abeja 2
 		entyCoor[3] = (coor){45, 5};	//abeja 3
 		// Podria hacer q se guarden las ubis en el actualGame para q no se reinicien las ubis cuando abris el menu
+		// 	o no permitir abrir el menu en la calle con abejas
+		// 	sin duda quedaria mejor guardar las ubis pero seria mucho trabajo cargarlas a cada rato
 	}
 
 	// Mientras no impactes con nada va a seguir esperando inputs
@@ -382,7 +389,7 @@ int menuDeCalle (){
 		// debugNdlData(&noviaDeLisa);
 
 		calleInput = getch();
-		freeze_ms(50);
+		// freeze_ms(50);
 
 		if (calleInput == '.'){
 			// Detener el thread de dibujo
@@ -480,7 +487,7 @@ void* threadDibujoCalle(void* arg) {
 	int loc = *(int*)arg; // Convertir el argumento genérico a int
     while (seguirDibujando) {
 
-		if (timeChange == 0){
+		if (timeChange){
 			dibujarEscena(listaDeEscenas[noviaDeLisa.calleLoc].escVisual, loc);
 		} else {
 			dibujarEscena(listaDeEscenas[noviaDeLisa.calleLoc].escVisualAlt, loc);
@@ -499,11 +506,8 @@ void* threadDibujoCalle(void* arg) {
 void* threadTimeChange() {
     while (seguirDibujando) {
 
-		freeze_ms(800);
-		timeChange = 1;
-
-		freeze_ms(800);
-		timeChange = 0;
+		freeze_ms(1000);
+		timeChange = !timeChange;
 
 		if (impactoConEntidad != 0)
 			pthread_exit(NULL);
@@ -513,23 +517,38 @@ void* threadTimeChange() {
 
 void* threadActualizarCoorAbejas() {
     while (seguirDibujando) {
-
 		entyCoor[1] = randomUbi(entyCoor[1], listaDeEscenas[noviaDeLisa.calleLoc].escLimit);
 		entyCoor[2] = randomUbi(entyCoor[2], listaDeEscenas[noviaDeLisa.calleLoc].escLimit);
 		entyCoor[3] = randomUbi(entyCoor[3], listaDeEscenas[noviaDeLisa.calleLoc].escLimit);
-
+		
 		consultarImpactoConAbeja();
 
 		if (impactoConEntidad != 0){
 			pthread_exit(NULL);
 		}
 
-		freeze_ms(600);
+		freeze_ms(500);
+
+	/////////////////////////////////////
+		entyCoor[1] = randomUbi(entyCoor[1], listaDeEscenas[noviaDeLisa.calleLoc].escLimit);
+		entyCoor[2] = randomUbi(entyCoor[2], listaDeEscenas[noviaDeLisa.calleLoc].escLimit);
+		entyCoor[3] = randomUbi(entyCoor[3], listaDeEscenas[noviaDeLisa.calleLoc].escLimit);
+		
+		consultarImpactoConAbeja();
+
+		if (impactoConEntidad != 0){
+			pthread_exit(NULL);
+		}
+
+		freeze_ms(500);
+
+		timeChange = !timeChange;
     }
     return NULL;
 }
 
-// Puedo usar esta accion para consultar el impacto con las abejas solo cuando se mueve una abeja o ndl (y no por fps)
+// Sirve para consultar el impacto con las abejas 
+// 	y solo lo uso cuando se mueve una abeja o ndl (y no por fps)
 void consultarImpactoConAbeja(){
 
 		if((noviaDeLisa.cantFlores > 0) && 
@@ -575,6 +594,8 @@ void consultarImpactoConAbeja(){
 
 
 int menuDeVecino(){
+	cls();
+	ubicarPivote();
 
 	coor auxUbiCalle = noviaDeLisa.ubi;
 	int auxMisionesCumplidas = noviaDeLisa.misionesCumplidas;
@@ -593,19 +614,20 @@ int menuDeVecino(){
 		switch (getch()){
 			case 'a':
 			case 'A':
-			case 'K':
+			case 75:
 				vecinoFocusOption = 1;
 				actualizarMenuVecino(1);
 				break;
 
 			case 'd':
 			case 'D':
-			case 'M':
+			case 77:
 				vecinoFocusOption = 2;
 				actualizarMenuVecino(2);
 				break;
 
 			case ' ':
+			case '\r':
 				// Uso cls() porq asi es mas facil borrar el hud del vecino cuando comienza el minijuego.
 				cls();
 				ubicarPivote();

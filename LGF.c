@@ -20,11 +20,8 @@ int main() {
 	
 	printf("\e[?25l");	//ESCONDE EL "CURSOR" (PARA SIEMPRE)
 
-    // MAIN MENU
+    // LAUNCH MENU
 	do{
-		// actualGame = noviaDeLisa;
-		// error2("actualGame.hp:", actualGame.HP);
-
 		//DEVUELVE EL CURSOR AL PRINCIPIO DEL TERMINAL
 		printf("\e[%iA", 100);
 
@@ -32,16 +29,15 @@ int main() {
 		printf("\e[%iA\r", 100);
 
 		printf("+----------------------------------------------------------------------------------------------------------------------+");
-		printf("\n\n\n\n\n");
+		printf("\n\n\n\n\n\n\n");
 
 		if (access("save.txt", F_OK) == 0) {
-	        // printf("\n\n\t\t   MENU\n\n\t\t 1.CONTINUAR  	\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\t\t 4.GUARDAR PARTIDA\n\t\t 5.BORRAR PARTIDA\n\n\n\n");
-	        printf("\n\n\t\t   MENU\n\n\t\t 1.CONTINUAR  	\n\t\t \n\t\t 3.SALIR\n\n\n\n\n\n");
+	        printf("\t\t   MENU\n\n\t\t 1.CONTINUAR  	\n\t\t \n\t\t 3.SALIR\n");
 		} else {
-			printf("\n\n\t\t   MENU\n\n\t\t 1.JUGAR\n\t\t \n\t\t 3.SALIR\n\n\n\n\n\n");
+			printf("\t\t   MENU\n\n\t\t 1.JUGAR\n\t\t \n\t\t 3.SALIR\n");
 		}
 
-		printf("\n\n\n                                                                                                                        ");
+		printf("\n\n\n\n\n\n\n\n");
 		printf("\n                                                     CONTROLES                                                          ");
 		printf("\n                                                                                                                        ");
 		printf("\n                                  MOVIMIENTO:                        SELECCIONAR:                                       ");
@@ -83,10 +79,11 @@ int main() {
 		
 	int menuOptionFocus = 1;
 
+    // INGAME MENU
 	do{
 		op = 'x';
 
-		while (op != '\r' && op != ' '){
+		while (op != '\r' && op != ' ' && op != '\033'){
 			//DEVUELVE EL CURSOR AL PRINCIPIO DEL TERMINAL
 			printf("\e[%iA", 100);
 
@@ -94,21 +91,17 @@ int main() {
 			printf("\e[%iA\r", 100);
 
 			printf("+----------------------------------------------------------------------------------------------------------------------+");
-			printf("\n\n\n\n\n");
+			printf("\n\n\n\n\n\n\n");
 
 			// if (access("save.txt", F_OK) == 0) {
-				printf("\n\n\t    MENU\n\n\t ");
-				printf("%s CONTINUAR  	\n\t ", 1 == menuOptionFocus ? "*" : "  ");
-				printf("%s CONFIG \n\t ", 2 == menuOptionFocus ? "*" : "  ");
-				printf("%s SALIR \n\t ", 3 == menuOptionFocus ? "*" : "  ");
-				printf("%s GUARDAR PARTIDA \n\t ", 4 == menuOptionFocus ? "*" : "  ");
-				printf("%s BORRAR PARTIDA \n\n\n\n", 5 == menuOptionFocus ? "*" : "  ");
-				// printf("\n\n\t\t   MENU\n\n\t\t 1.CONTINUAR  	\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\n\n\n\n\n");
-			// } else {
-			// 	printf("\n\n\t\t   MENU\n\n\t\t 1.JUGAR\n\t\t 2.CONFIG\n\t\t 3.SALIR\n\n\n\n\n\n");
-			// }
+			printf("\t    MENU\n\n ");
+			printf("\t%s CONTINUAR \n ", 1 == menuOptionFocus ? "*" : "  ");
+			printf("\t%s CONFIG \n ", 2 == menuOptionFocus ? "*" : "  ");
+			printf("\t%s SALIR \n ", 3 == menuOptionFocus ? "*" : "  ");
+			printf("\t%s GUARDAR PARTIDA \n ", 4 == menuOptionFocus ? "*" : "  ");
+			printf("\t%s BORRAR PARTIDA \n", 5 == menuOptionFocus ? "*" : "  ");
 
-			printf("\n\n\n                                                                                                                        ");
+			printf("\n\n\n\n\n\n");
 			printf("\n                                                     CONTROLES                                                          ");
 			printf("\n                                                                                                                        ");
 			printf("\n                                  MOVIMIENTO:                        SELECCIONAR:                                       ");
@@ -124,6 +117,7 @@ int main() {
 			switch (op){
 				case 'w':
 				case 'W':
+				case 72:
 					if (menuOptionFocus > 1){
 						menuOptionFocus--;
 					} else{
@@ -134,12 +128,16 @@ int main() {
 
 				case 's':
 				case 'S':
+				case 80:
 					if (menuOptionFocus < 5){
 						menuOptionFocus++;
 					} else{
 						menuOptionFocus = 1;
 					}
-					
+					break;
+
+				case '\033':
+					menuOptionFocus = 1;
 					break;
 				
 				default:
@@ -157,7 +155,6 @@ int main() {
 				
 			case 2:
 				// ABRIR CONFIG.
-				// cls();
 				optionsMenu(&actualGame);
 				break;
 
@@ -177,11 +174,6 @@ int main() {
 			case 5:
 				// BORRAR PARTIDA GUARDADA
 				deleteSaveMenu();
-				// cls();
-				// if (access("save.txt", F_OK) == 0) {
-				// 	remove("save.txt");
-				// }
-				// actualGame.ubi.y = 0;
 				break;
 
 			default:
@@ -222,6 +214,7 @@ void optionsMenu(Player *data) {
 		switch (optionInput){
 			case 'w':
 			case 'W':
+			case 72:
 				if (optionFocus < 7){
 					optionFocus++;
 				} else {
@@ -231,6 +224,7 @@ void optionsMenu(Player *data) {
 
 			case 's':
 			case 'S':
+			case 80:
 				if (optionFocus > 1){
 					optionFocus--;
 				} else {
@@ -240,8 +234,11 @@ void optionsMenu(Player *data) {
 
 			case ' ':
 			case '\r':
+				if (data->colorL == 30 + optionFocus){
+					optionInput = '.';
+				}
 				data->colorL = 30 + optionFocus;
-				guardarPartida(&actualGame, 0);
+				guardarPartida(&actualGame, 2);
 				break;
 			
 			default:
@@ -254,21 +251,13 @@ void optionsMenu(Player *data) {
 	for (int i = 7; i > 0; i--) {
 		printf("\t\t\t\t\t\t\t\t\t\t\t\t             \n");
 	}
-	// printf("\n\n\n\n\n\n\n\n\n\n\n\n\n");
-
-	// if (optionInput == '\r' || optionInput == ' '){
-	// 	data->colorL = 30 + optionFocus;
-	// 	guardarPartida(&actualGame, 0);
-	// }
-	
-	// cls();
 }
 
 
 
 
 void deleteSaveMenu(){
-	char optionFocus = 0;
+	bool isSure = false;
 	char optionInput = 'x';
 
 	while (optionInput != '\033' && optionInput != '\r' && optionInput != ' ' && optionInput != '.' && optionInput != '3' && optionInput != '2'){
@@ -276,20 +265,22 @@ void deleteSaveMenu(){
 		printf("\e[%iA\n", 100);
 		printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 		printf("\t      BORRAR?\n\n");
-		printf("\t   %s NO \n", 0 == optionFocus ? "*" : "  ");
-		printf("\t   %s SI \n", 1 == optionFocus ? "*" : "  ");
+		printf("\t   %s NO \n", !isSure ? "*" : "  ");
+		printf("\t   %s SI \n", isSure ? "*" : "  ");
 
 		optionInput = getch();
 
 		switch (optionInput){
 			case 'w':
 			case 'W':
-				optionFocus = 0;
+			case 72:
+				isSure = !isSure;
 				break;
 
 			case 's':
 			case 'S':
-				optionFocus = 1;
+			case 80:
+				isSure = !isSure;
 				break;
 			
 			default:
@@ -303,7 +294,7 @@ void deleteSaveMenu(){
 	printf("\t         \n");
 	printf("\t         \n");
 
-	if ((optionInput == '\r' || optionInput == ' ') && optionFocus == 1){
+	if ((optionInput == '\r' || optionInput == ' ') && isSure){
 		cls();
 		if (access("save.txt", F_OK) == 0) {
 			remove("save.txt");
