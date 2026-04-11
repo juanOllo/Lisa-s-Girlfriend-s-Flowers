@@ -14,9 +14,9 @@ coor curas;
 
 // Matrices que guardan las escenas
 typedef struct {
-	char escVisual[max][max2];
-	char escVisualAlt[max][max2];
-	char escLimit[max][max2];
+	char escVisual[maxV][maxH];
+	char escVisualAlt[maxV][maxH];
+	char escLimit[maxV][maxH];
 } escCollection;
 escCollection listaDeEscenas[10];
 
@@ -31,7 +31,7 @@ int menuDeVecino();
 	int vecinoGameplay();
 
 // 	Mas funciones
-int dibujarEscena(char d[max][max2], int loc);
+int dibujarEscena(char d[maxV][maxH], int loc);
 
 
 //lo uso para cargar la data guardada en el pj
@@ -258,7 +258,7 @@ int menuDeCasa(){
 	int estadoEnCasa = 0;
 	char casaInput = 'x';
 
-    while(casaInput != '.'){
+    while(casaInput != '.' && casaInput != '\033'){
     // while(estadoEnCasa == 0){
 
 		//	DEVUELVE 1 SI SALISTE A LA CALLE
@@ -270,7 +270,6 @@ int menuDeCasa(){
         switch(estadoEnCasa){
             case 0:
                 // casaInput = getch();
-				// noviaDeLisa.ubi = movimiento2(noviaDeLisa.ubi, listaDeEscenas[0].escVisualLimit, 0);
                 break;
 
 			// SALIO A LA CALLE POR LA PUERTA.
@@ -302,13 +301,13 @@ int menuDeCasa(){
 				tomarCurasCinematica();
 
 				actualizarHP(noviaDeLisa.hp);
-				freeze_ms(500);
+				sleep_ms(500);
 				do{
-					freeze_ms(100);
+					sleep_ms(100);
 					noviaDeLisa.hp = noviaDeLisa.hp + 10;
 					actualizarHP(noviaDeLisa.hp);
 				}while (noviaDeLisa.hp < 80);
-				freeze_ms(700);
+				sleep_ms(700);
 
 				estadoEnCasa = dibujarEscena(listaDeEscenas[0].escVisual, 1);
 				break;
@@ -318,14 +317,15 @@ int menuDeCasa(){
         }
 
 		casaInput = getch();
-		// freeze_ms(30);
+		// sleep_ms(30);
 
-		if (casaInput == '.')
+		if (casaInput == '.' || casaInput == '\033')
 			return 6;		
         
 		// MOVIMIENTO DE noviaDeLisa
-		noviaDeLisa.ubi = movimientoConInput(casaInput, noviaDeLisa.ubi, listaDeEscenas[0].escLimit, 0);
+		noviaDeLisa.ubi = movimientoConInput(casaInput, noviaDeLisa.ubi, listaDeEscenas[0].escLimit, 10);
     }
+	return 6;		
 }
 
 
@@ -389,9 +389,9 @@ int menuDeCalle (){
 		// debugNdlData(&noviaDeLisa);
 
 		calleInput = getch();
-		// freeze_ms(50);
+		sleep_ms(50);
 
-		if (calleInput == '.'){
+		if (calleInput == '.' || calleInput == '\033'){
 			// Detener el thread de dibujo
 			seguirDibujando = false;
 			pthread_join(hiloDibujoCalle, NULL);
@@ -402,7 +402,7 @@ int menuDeCalle (){
 		}
 
 		// MOVIMIENTO DE noviaDeLisa
-		noviaDeLisa.ubi = movimientoConInput(calleInput, noviaDeLisa.ubi, listaDeEscenas[noviaDeLisa.calleLoc].escLimit, 1);
+		noviaDeLisa.ubi = movimientoConInput(calleInput, noviaDeLisa.ubi, listaDeEscenas[noviaDeLisa.calleLoc].escLimit, 0);
 
 		consultarImpactoConAbeja();
 
@@ -410,7 +410,7 @@ int menuDeCalle (){
 		//	ENTRAR A CASA
 		if(noviaDeLisa.calleLoc==1 && proximo(noviaDeLisa.ubi, entyCoor[10])==2){
 			impactoConEntidad = 1;
-			freeze_ms(100);
+			sleep_ms(100);
 
 			noviaDeLisa.ubi = (coor){52, 7};
 		}
@@ -420,17 +420,17 @@ int menuDeCalle (){
 			dibujarEscena(listaDeEscenas[noviaDeLisa.calleLoc].escVisual, 2);
 			if(noviaDeLisa.calleLoc-1 > noviaDeLisa.misionesCumplidas){
 				impactoConEntidad = 2;
-				freeze_ms(100);
+				sleep_ms(100);
 				
 				printf("\e[%iA", 1);
 				printf("\tDebes entregas la flor anterior.\n");
-				freeze_ms(1000);
+				sleep_ms(1000);
 				printf("\e[%iA", 1);
 				printf("\t                                         \n");
 
 			} else if(noviaDeLisa.calleLoc <= noviaDeLisa.misionesCumplidas){
 				impactoConEntidad = 2;
-				freeze_ms(100);
+				sleep_ms(100);
 
 				printf("\e[%iA", 6);
 				printf("\t\t\t\t\t	 _______________________________ \n");
@@ -439,7 +439,7 @@ int menuDeCalle (){
 				printf("\t\t\t\t\t	|_______________________________|\n");
 				ubicarPivote();
 				noviaDeLisa.ubi.y--;
-				freeze_ms(1500);
+				sleep_ms(1500);
 
 				if (noviaDeLisa.lucides[noviaDeLisa.calleLoc-1] == 1){
 					printf ("\t(alguien la entrego por ti)\n");
@@ -449,14 +449,14 @@ int menuDeCalle (){
 			} else{
 				// ENTRAS A LA CASA DEL VECINO
 				impactoConEntidad = 3;
-				freeze_ms(100);
+				sleep_ms(100);
 			}
 		}
 
 		//	AVANZAR DE CALLE
 		if(noviaDeLisa.ubi.x > 59){
 			impactoConEntidad = 2;
-			freeze_ms(100);
+			sleep_ms(100);
 
 			cambiarCalleAnim(listaDeEscenas[noviaDeLisa.calleLoc].escVisual, listaDeEscenas[noviaDeLisa.calleLoc+1].escVisual, 'd');
 			noviaDeLisa.calleLoc++;
@@ -466,7 +466,7 @@ int menuDeCalle (){
 		//	VOLVER UNA CALLE
 		if(noviaDeLisa.ubi.x < 1){
 			impactoConEntidad = 2;
-			freeze_ms(100);
+			sleep_ms(100);
 
 			cambiarCalleAnim(listaDeEscenas[noviaDeLisa.calleLoc].escVisual, listaDeEscenas[noviaDeLisa.calleLoc-1].escVisual, 'i');
 			noviaDeLisa.calleLoc--;
@@ -498,7 +498,7 @@ void* threadDibujoCalle(void* arg) {
 		if (impactoConEntidad != 0)
 			pthread_exit(NULL);
 
-		freeze_ms(40);
+		sleep_ms(40);
     }
     return NULL;
 }
@@ -506,7 +506,7 @@ void* threadDibujoCalle(void* arg) {
 void* threadTimeChange() {
     while (seguirDibujando) {
 
-		freeze_ms(1000);
+		sleep_ms(1000);
 		timeChange = !timeChange;
 
 		if (impactoConEntidad != 0)
@@ -527,7 +527,7 @@ void* threadActualizarCoorAbejas() {
 			pthread_exit(NULL);
 		}
 
-		freeze_ms(500);
+		sleep_ms(500);
 
 	/////////////////////////////////////
 		entyCoor[1] = randomUbi(entyCoor[1], listaDeEscenas[noviaDeLisa.calleLoc].escLimit);
@@ -540,7 +540,7 @@ void* threadActualizarCoorAbejas() {
 			pthread_exit(NULL);
 		}
 
-		freeze_ms(500);
+		sleep_ms(500);
 
 		timeChange = !timeChange;
     }
@@ -558,7 +558,7 @@ void consultarImpactoConAbeja(){
 			(proximoAbeja(noviaDeLisa.ubi, entyCoor[3]) > 0)
 		)){
 			impactoConEntidad = 1;
-			freeze_ms(1000);
+			sleep_ms(1000);
 			// debugStringCoor("ndl", noviaDeLisa.ubi);
 			// debugStringCoor("abeja 1", entyCoor[1]);
 			// debugStringCoor("abeja 2", entyCoor[2]);
@@ -778,15 +778,15 @@ int vecinoGameplay(){
 			pthread_create(&hiloEntidades, NULL, threadActualizarUbisDeObstaculos, NULL);
 
 			while (impactoConEntidad == 0){
-				freeze_ms(50);
+				sleep_ms(50);
 
-				noviaDeLisa.ubi = movimiento2(noviaDeLisa.ubi, listaDeEscenas[5].escLimit, 3);
-				// freeze_ms(100); // Pequeña pausa para evitar que el thread de dibujo consuma demasiados recursos
+				noviaDeLisa.ubi = movimientoConInput(getch(), noviaDeLisa.ubi, listaDeEscenas[5].escLimit, 1);
+				// sleep_ms(100); // Pequeña pausa para evitar que el thread de dibujo consuma demasiados recursos
 
 				// CHECKEA SI LLEGASTE AL VECINO
 				if (noviaDeLisa.ubi.x > 50){
 					impactoConEntidad = 2;
-					freeze_ms(100);
+					sleep_ms(100);
 					cinematica(103, 2000);
 				}
 			}			
@@ -832,7 +832,7 @@ int vecinoGameplay(){
 
 			while (impactoConEntidad == 0){
 
-				noviaDeLisa.ubi = movimiento2(noviaDeLisa.ubi, listaDeEscenas[6].escLimit, 4);
+				noviaDeLisa.ubi = movimientoConInput(getch(), noviaDeLisa.ubi, listaDeEscenas[6].escLimit, 2);
 				
 				// CHECKEA SI LLEGASTE A ALGUN VECINO DESP DE CADA INPUT
 				if (noviaDeLisa.ubi.y == 13 || noviaDeLisa.ubi.x == 10 || noviaDeLisa.ubi.x == 50){
@@ -879,7 +879,7 @@ int vecinoGameplay(){
 					// SI ENTREGASTE LAS 3 FLORES EL MINIJUEGO TERMINA
 					if (cuantosVecinosRecibieronFlor >= 3){
 						impactoConEntidad = 2;
-						freeze_ms(100);
+						sleep_ms(100);
 						cinematica(188, 2000);
 					}
 				}
@@ -896,7 +896,7 @@ int vecinoGameplay(){
 			break;
 
 		case 3:
-			// TERCER VECINO - MINIJUEGO DE ESCUCHAR
+			// TERCER VECINO - MINIJUEGO DEL LABERINTO
 			noviaDeLisa.ubi = (coor){12, 8};
 			actualizarHP(noviaDeLisa.hp);
 			cargarEscenasConAlternativa(listaDeEscenas[7].escVisual, listaDeEscenas[7].escVisualAlt, listaDeEscenas[7].escLimit, 324);
@@ -912,16 +912,15 @@ int vecinoGameplay(){
 			pthread_create(&hiloTimeSwitch, NULL, threadTimeSwitch, &loc5);
 
 			while (impactoConEntidad == 0){
-				freeze_ms(50);
+				sleep_ms(50);
 
-				// noviaDeLisa.ubi = movimiento2(noviaDeLisa.ubi, listaDeEscenas[7].escLimit, 5);
-				noviaDeLisa.ubi = movimientoConInput(getch(), noviaDeLisa.ubi, listaDeEscenas[7].escLimit, 5);
-				// freeze_ms(100); // Pequeña pausa para evitar que el thread de dibujo consuma demasiados recursos
+				noviaDeLisa.ubi = movimientoConInput(getch(), noviaDeLisa.ubi, listaDeEscenas[7].escLimit, 3);
+				// sleep_ms(100); // Pequeña pausa para evitar que el thread de dibujo consuma demasiados recursos
 
 				// CHECKEA SI LLEGASTE AL VECINO
 				if (noviaDeLisa.ubi.x >= 48 && noviaDeLisa.ubi.y <= 8){
 					impactoConEntidad = 2;
-					freeze_ms(100);
+					sleep_ms(100);
 					cinematica(273, 2000);
 				}
 			}
@@ -958,7 +957,7 @@ void* threadDibujoVecino(void* arg) {
 				pthread_exit(NULL);
 			}
 
-			freeze_ms(fpsDibujo);
+			sleep_ms(fpsDibujo);
 		}
 		
 	// Uso el timeSwitch solo cuando estoy con el vecino 3
@@ -975,7 +974,7 @@ void* threadDibujoVecino(void* arg) {
 				pthread_exit(NULL);
 			}
 
-			freeze_ms(fpsDibujo);
+			sleep_ms(fpsDibujo);
 		}
 	}
 
@@ -1001,7 +1000,7 @@ void* threadActualizarUbisDeObstaculos(void* arg) {
 		if (impactoConEntidad != 0)
 			pthread_exit(NULL);
 		
-		freeze_ms(vObs);
+		sleep_ms(vObs);
     }
     return NULL;
 }
@@ -1052,7 +1051,7 @@ void* threadActualizarUbisDeBalones(void* arg) {
 		if (impactoConEntidad != 0)
 			pthread_exit(NULL);
 
-		freeze_ms(vBals);
+		sleep_ms(vBals);
     }
     return NULL;
 }
@@ -1066,7 +1065,7 @@ void* threadTimeSwitch() {
 			timeSwitch++;
 			
 			olaUbi = olaUbi+3;
-			for (int i = (olaUbi%2); i < max; i=i+2){
+			for (int i = (olaUbi%2); i < maxV; i=i+2){
 
 				memcpy(&listaDeEscenas[7].escVisualAlt[i][olaUbi-1], "   ", 3);
 				memcpy(&listaDeEscenas[7].escVisualAlt[i+1][olaUbi-1], "   ", 3);
@@ -1085,7 +1084,7 @@ void* threadTimeSwitch() {
 		if (impactoConEntidad != 0)
 			pthread_exit(NULL);
 
-		freeze_ms(800);
+		sleep_ms(800);
     }
     return NULL;
 }
@@ -1111,7 +1110,7 @@ void* threadTimeSwitch() {
 
 // ESTA FUNCION DIBUJA LA ESCENA SEGUN LA UBICACION DEL PERSONAJE
 // 		SI NO HACES CONTACTO CON NADA DEVUELVE 0
-int dibujarEscena(char d[max][max2], int loc){
+int dibujarEscena(char d[maxV][maxH], int loc){
 
 	// ubicarPivote();
 	printf("\e[%iA", 15);
@@ -1121,22 +1120,22 @@ int dibujarEscena(char d[max][max2], int loc){
         case 1:											//DIBUJA LA ESCENA DE LA CASA		
 
 			// 		ESTE FOR SOLO DIBUJA LA ESCENA
-            for(int i = max-1; i > 1; i--){
+            for(int i = maxV-1; i > 1; i--){
                 printf("                              ");
-                for(int j = 1; j < max2-1; j++){
+                for(int j = 1; j < maxH-1; j++){
 
 					// Era una idea tipo para que solo actualize las filas de ndl pero no anda
 					// 	porq primero se deberia dibujar todo una vez almenos
 					// if (i > noviaDeLisa.ubi.y + 3 || i < noviaDeLisa.ubi.y - 1){
 					// 	// printf("\n");
-					// 	j = max2;
+					// 	j = maxH;
 					// } else 
 						
 						// Este if es para un mejor rendimiento del dibujo porq asi no chequea char x char
 						//  y la fila que no necesita actualizacion visual la dibuja de una
 					if (i > noviaDeLisa.ubi.y + 2 || i < noviaDeLisa.ubi.y){
-						printf("%.60s", d[max-i] + 1);
-						j = max2+1;
+						printf("%.60s", d[maxV-i] + 1);
+						j = maxH+1;
           			
 					} else if(i == noviaDeLisa.ubi.y+2 && j == noviaDeLisa.ubi.x){
 						printf(CABEZA);
@@ -1155,7 +1154,7 @@ int dibujarEscena(char d[max][max2], int loc){
 						j++;
 
                     }else{
-                        printf("%c", d[max-i][j]);
+                        printf("%c", d[maxV-i][j]);
                     }
                 }
                 printf("\n");
@@ -1182,13 +1181,13 @@ int dibujarEscena(char d[max][max2], int loc){
 		case 2:											//DIBUJA LA ESCENA DE LA CALLE
 
 			// ESTE FOR SOLO DIBUJA LA ESCENA
-            for(int i = max-1; i > 1; i--){
+            for(int i = maxV-1; i > 1; i--){
                 printf("                              ");
-                for(int j = 1; j < max2-1; j++){
+                for(int j = 1; j < maxH-1; j++){
 
 					// if ((i != noviaDeLisa.ubi.y) && (i != entyCoor[1].y) && (i != entyCoor[2].y) && (i != entyCoor[3].y)){
-					// 	printf("%.60s", d[max-i] + 1);
-					// 	j = max2+1;
+					// 	printf("%.60s", d[maxV-i] + 1);
+					// 	j = maxH+1;
           			
 					// } else 
 					if((noviaDeLisa.calleLoc == noviaDeLisa.misionesCumplidas) && (noviaDeLisa.misionesCumplidas > 0) && ((j == entyCoor[1].x) && (i == entyCoor[1].y) || (j == entyCoor[2].x) && (i == entyCoor[2].y) || (j == entyCoor[3].x) && (i == entyCoor[3].y))){
@@ -1203,7 +1202,7 @@ int dibujarEscena(char d[max][max2], int loc){
 							j++;
 						}
                     } else{
-                        printf("%c", d[max-i][j]);
+                        printf("%c", d[maxV-i][j]);
                     }
                 }
 				// El ' ' en el printf es para borrar la flor q se buguea a la derecha de la escena de la calle.
@@ -1216,15 +1215,15 @@ int dibujarEscena(char d[max][max2], int loc){
 		case 3:											//DIBUJA LA ESCENA DEL VECINO 1
 
 			// ESTE FOR SOLO DIBUJA LA ESCENA
-            for(int i = max-1; i > 1; i--){
+            for(int i = maxV-1; i > 1; i--){
                 printf("                              ");
 				// Segun yo este if deberia mejorar el rendimiento del dibujo
 				if ((i % 2) != 0){
 					// Printea un String de 60 caracteres sin contar el primero (que es un #)
-					printf("%.60s", d[max-i] + 1);
+					printf("%.60s", d[maxV-i] + 1);
 					
 				} else {
-					for(int j = 1; j < max2-1; j++){
+					for(int j = 1; j < maxH-1; j++){
 	
 						if((j == obstaculos[0].x) && (i == obstaculos[0].y)
 							||
@@ -1254,7 +1253,7 @@ int dibujarEscena(char d[max][max2], int loc){
 							j++;
 	
 						} else{
-							printf("%c", d[max-i][j]);
+							printf("%c", d[maxV-i][j]);
 						}
 					}
 				}
@@ -1269,10 +1268,10 @@ int dibujarEscena(char d[max][max2], int loc){
 		case 4:											//DIBUJA LA ESCENA DEL VECINO 2
 
 			// ESTE FOR SOLO DIBUJA LA ESCENA
-            for(int i = max-1; i > 1; i--){
+            for(int i = maxV-1; i > 1; i--){
                 printf("                              ");
 				
-                for(int j = 1; j < max2-1; j++){
+                for(int j = 1; j < maxH-1; j++){
 					if (((j == balones[0].x+1) && (i == balones[0].y+1)) || ((j == balones[5].x) && (i == balones[5].y+1))){
 						printf("s");
 
@@ -1309,7 +1308,7 @@ int dibujarEscena(char d[max][max2], int loc){
 						j++;
 						
                     } else{
-                        printf("%c", d[max-i][j]);
+                        printf("%c", d[maxV-i][j]);
                     }
                 }
 				// el espacio en este printf es para borrar el obstaculo q se buguea a la derecha del vecino
@@ -1322,17 +1321,17 @@ int dibujarEscena(char d[max][max2], int loc){
 		case 5:											//DIBUJA LA ESCENA DEL VECINO 3
 
 			// ESTE FOR SOLO DIBUJA LA ESCENA
-            for(int i = max-1; i > 1; i--){
+            for(int i = maxV-1; i > 1; i--){
                 printf("                              ");
 				
-                for(int j = 1; j < max2-1; j++){
+                for(int j = 1; j < maxH-1; j++){
 					if((j == noviaDeLisa.ubi.x) && (i == noviaDeLisa.ubi.y)){
 						printNdl(noviaDeLisa.colorL);
 						printf("*");
 						j++;
 
                     } else{
-                        printf("%c", d[max-i][j]);
+                        printf("%c", d[maxV-i][j]);
                     }
                 }
 				// este prntf es para borrar el obstaculo q se buguea a la derecha del vecino
@@ -1341,7 +1340,7 @@ int dibujarEscena(char d[max][max2], int loc){
 
 			if (olaUbi >= noviaDeLisa.ubi.x){
 				// Le meto freeze para q se alcanze a dibujar una ola sobre L antes de frenar los threads
-				freeze_ms(200);
+				sleep_ms(200);
 				impactoConEntidad = 1;
 			}
 

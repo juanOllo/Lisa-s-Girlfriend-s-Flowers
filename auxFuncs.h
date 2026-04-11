@@ -16,10 +16,8 @@
 #include <pthread.h>
 #include <stdbool.h>
 
-// #define max 16
-#define max 17
-// #define max2 60
-#define max2 62
+#define maxV 17
+#define maxH 62
 #define SIZE 200
 
 int osMultiplicadorDeVelocidad = velocity;
@@ -44,24 +42,23 @@ typedef struct {
 // No es necesario pero las defino aca para encontrarlas mas rapido
 void actualizarHP(int hp);  
 void actualizarMenuVecino(int vecinoFocusOption);
-void cambiarCalleAnim(char escena[max][max2], char escena2[max][max2], char direccion);
-void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], int l);
-void cargarEscenasConAlternativa(char escenaVisual[max][max2], char escenaVisualAlternativa[max][max2], char escenaLimites[max][max2], int l);
+void cambiarCalleAnim(char escena[maxV][maxH], char escena2[maxV][maxH], char direccion);
+void cargarEscenas(char escenaVisual[maxV][maxH], char escenaLimites[maxV][maxH], int l);
+void cargarEscenasConAlternativa(char escenaVisual[maxV][maxH], char escenaVisualAlternativa[maxV][maxH], char escenaLimites[maxV][maxH], int l);
 void guardarPartida(Player *ndl, int typeSave);
 void leerEscuchar(int cont);
-coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
-coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle);
+coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[maxV][maxH], int casaOCalle);
 void printNdl(int colorL);
 int proximo(coor u, coor e);
 int proximoAbeja(coor ndl, coor abeja);
-coor randomUbi(coor e, char limit[max][max2]);
+coor randomUbi(coor e, char limit[maxV][maxH]);
 void ubicarPivote();
 
 // Funciones solo para debuguear
 void debugString(char errorMsj[100]);
 void debugStringInt(char msj[100], int a);
 void debugChar(char a);
-void debugEscena(char escena[max][max2]);
+void debugEscena(char escena[maxV][maxH]);
 void debugNdlData(Player *ndl);
 
 
@@ -145,7 +142,7 @@ void actualizarMenuVecino(int vecinoFocusOption){
 
                     //                                                  'i' = izquierda
                     // Escena actual            Escena a la q vas       'd' = derecha
-void cambiarCalleAnim(char escena[max][max2], char escena2[max][max2], char direccion){
+void cambiarCalleAnim(char escena[maxV][maxH], char escena2[maxV][maxH], char direccion){
 	printf("\e[%iA", 15);
 
     int k = 1;
@@ -153,16 +150,16 @@ void cambiarCalleAnim(char escena[max][max2], char escena2[max][max2], char dire
     switch (direccion){
         // DERECHA
         case 'd':
-            while (k < max2-1){
+            while (k < maxH-1){
                 
-                for(int i = max-1; i > 1; i--){
+                for(int i = maxV-1; i > 1; i--){
                     printf("                              ");
-                    for(int j = k; j < max2-1; j++){
-                        printf("%c", escena[max-i][j]);
+                    for(int j = k; j < maxH-1; j++){
+                        printf("%c", escena[maxV-i][j]);
                     }
 
                     for (int d = 1; d < (k+1); d++){
-                        printf("%c", escena2[max-i][d]);
+                        printf("%c", escena2[maxV-i][d]);
                     }
 
                     // El ' ' en el printf es para borrar la flor q se buguea a la derecha de la escena de la calle.
@@ -176,18 +173,18 @@ void cambiarCalleAnim(char escena[max][max2], char escena2[max][max2], char dire
 
         // IZQUIERDA
         case 'i':
-            while (k < max2-2){
+            while (k < maxH-2){
                 
-                for(int i = max-1; i > 1; i--){
+                for(int i = maxV-1; i > 1; i--){
                     printf("                              ");
                     // Escena a la q voy
-                    for (int d = ((max2-2)-k); d < (max2-1); d++){
-                        printf("%c", escena2[max-i][d]);
+                    for (int d = ((maxH-2)-k); d < (maxH-1); d++){
+                        printf("%c", escena2[maxV-i][d]);
                     }
 
                     // Escena en la q estoy
-                    for(int j = 1; j < (max2-2-k); j++){
-                        printf("%c", escena[max-i][j]);
+                    for(int j = 1; j < (maxH-2-k); j++){
+                        printf("%c", escena[maxV-i][j]);
                     }
 
                     // El ' ' en el printf es para borrar la flor q se buguea a la derecha de la escena de la calle.
@@ -213,12 +210,12 @@ void cambiarCalleAnim(char escena[max][max2], char escena2[max][max2], char dire
 // CARGA 2 MATRIZES CON ESCENAS DEL DOCUMENTO escenas.txt 
 //  COMENZANDO EN LA LINEA l
 //  CARGA LAS ESCENA QUE SE MUESTRA EN PANTALLA Y LA QUE MARCA LOS LIMITES AL MOVIMIENTO
-void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], int l){
+void cargarEscenas(char escenaVisual[maxV][maxH], char escenaLimites[maxV][maxH], int l){
     FILE *f;
     int i = 0;
     int j = 0;
     char aux;
-    char linea[max2+2];
+    char linea[maxH+2];
     
     f = fopen("escenas.txt", "r");
     
@@ -231,16 +228,16 @@ void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], 
     if(f != NULL){
 
         // Carga la escena que se va a mostrar en pantalla.
-        for (i = 0; i < max; i++){
-            for(j = 0; j < max2; j++){
+        for (i = 0; i < maxV; i++){
+            for(j = 0; j < maxH; j++){
                 fscanf(f, "%c", &escenaVisual[i][j]);
             }
             fscanf(f, "%c", &aux);
         }
 
         // Carga la escena que va a marcar los limites.
-        for (i = 0; i <= max; i++){
-            for(j = 0; j < max2; j++){
+        for (i = 0; i <= maxV; i++){
+            for(j = 0; j < maxH; j++){
                 fscanf(f, "%c", &escenaLimites[i][j]);
             }
             fscanf(f, "%c", &aux);
@@ -259,12 +256,12 @@ void cargarEscenas(char escenaVisual[max][max2], char escenaLimites[max][max2], 
 // CARGA 3 MATRIZES CON ESCENAS DEL DOCUMENTO escenas.txt 
 //  COMENZANDO EN LA LINEA l
 //  CARGA LAS 2 ESCENAS QUE SE ALTERNAN EN PANTALLA Y LA QUE MARCA LOS LIMITES
-void cargarEscenasConAlternativa(char escenaVisual[max][max2], char escenaVisualAlternativa[max][max2], char escenaLimites[max][max2], int l){
+void cargarEscenasConAlternativa(char escenaVisual[maxV][maxH], char escenaVisualAlternativa[maxV][maxH], char escenaLimites[maxV][maxH], int l){
     FILE *f;
     int i = 0;
     int j = 0;
     char aux;
-    char linea[max2+2];
+    char linea[maxH+2];
     
     f = fopen("escenas.txt", "r");
     
@@ -277,24 +274,24 @@ void cargarEscenasConAlternativa(char escenaVisual[max][max2], char escenaVisual
     if(f != NULL){
 
         // Carga la escena que se va a mostrar en pantalla.
-        for (i = 0; i < max; i++){
-            for(j = 0; j < max2; j++){
+        for (i = 0; i < maxV; i++){
+            for(j = 0; j < maxH; j++){
                 fscanf(f, "%c", &escenaVisual[i][j]);
             }
             fscanf(f, "%c", &aux);
         }
 
         // Carga la escena que se va a alternar visualmente con la primera.
-        for (i = 0; i < max; i++){
-            for(j = 0; j < max2; j++){
+        for (i = 0; i < maxV; i++){
+            for(j = 0; j < maxH; j++){
                 fscanf(f, "%c", &escenaVisualAlternativa[i][j]);
             }
             fscanf(f, "%c", &aux);
         }
 
         // Carga la escena que va a marcar los limites.
-        for (i = 0; i <= max; i++){
-            for(j = 0; j < max2; j++){
+        for (i = 0; i <= maxV; i++){
+            for(j = 0; j < maxH; j++){
                 fscanf(f, "%c", &escenaLimites[i][j]);
             }
             fscanf(f, "%c", &aux);
@@ -386,9 +383,22 @@ void guardarPartida(Player *ndl, int typeSabe){
 	fprintf(save, toSaveArray);
 	fclose(save);
 
+    // La barra de carga es falsa jsdjj
     if (typeSabe == 1){
         printf("\e[%iA", 1);
-        printf("\n\t+ [GUARDANDO PARTIDA] +");
+        printf("\n\t---+ [GUARDANDO PARTIDA                                                                           ] +");
+		printf("\e[%iA\r", 1);
+        sleep_ms(500);
+        printf("\n\t\t\t\t##############################");
+        sleep_ms(500);
+        printf("#######");
+        sleep_ms(200);
+        printf("############");
+        sleep_ms(500);
+        printf("#######################");
+        sleep_ms(300);
+        printf("##");
+        sleep_ms(500);
     }
     
 }
@@ -431,230 +441,159 @@ void leerEscuchar(int cont){
 
 
 // FUNCION QUE DEVUELVE NUEVA UBI DE NDL CUANDO TE MOVES RESPETANDO LIMITES
-//                    ubi actual                                    casa = 0
-//                    de ndl        escLimitCalle/Casa/Vecino       calle = 1
-//                                                                  vecino1 = 3
-//                                                                  vecino2 = 4
-coor movimiento2(coor actualUbi, char movimientoLimit[max][max2], int casaOCalle){
-
-    coor nuevaUbiAux;
-    // isOk sirve para q no redibuje la escena si no entro un input correcto
-    char input;
-
-     do{
-        nuevaUbiAux = actualUbi;
-        input = getch();
-
-        switch (casaOCalle){
-            case 0:
-            case 1:
-                switch (input){
-                    case 'd':
-                    case 'D':
-                    case 77:
-                        nuevaUbiAux.x = nuevaUbiAux.x + (3 - casaOCalle);
-                        break;
-                    case 'a':
-                    case 'A':
-                    case 75:
-                        nuevaUbiAux.x = nuevaUbiAux.x - (3 - casaOCalle);
-                        break;
-                    case 'w':
-                    case 'W':
-                    case 72:
-                        nuevaUbiAux.y = nuevaUbiAux.y + 1;
-                        break;
-                    case 's':
-                    case 'S':
-                    case 80:
-                        nuevaUbiAux.y = nuevaUbiAux.y - 1;
-                        break;
-                    // case '.':
-                    //     break;
-                    default:
-                        break;
-                }
-            break;
-
-            case 3:
-                switch (input){
-                    case 'd':
-                    case 'D':
-                    case 77:
-                        nuevaUbiAux.x = nuevaUbiAux.x + 2;
-                        break;
-                    // case 'a':
-                    // case 'A':
-                    // case 75:
-                    //     nuevaUbiAux.x = nuevaUbiAux.x - 2;
-                    //     break;
-                    case 'w':
-                    case 'W':
-                    case 72:
-                        nuevaUbiAux.y = nuevaUbiAux.y + 2;
-                        break;
-                    case 's':
-                    case 'S':
-                    case 80:
-                        nuevaUbiAux.y = nuevaUbiAux.y - 2;
-                        break;
-                    // case '.':
-                    //     break;
-                    default:
-                        break;
-                }
-            break;
-
-            case 4:
-                switch (input){
-                    case 'd':
-                    case 'D':
-                    case 77:
-                        nuevaUbiAux.x = nuevaUbiAux.x + 5;
-                        break;
-                    case 'a':
-                    case 'A':
-                    case 75:
-                        nuevaUbiAux.x = nuevaUbiAux.x - 5;
-                        break;
-                    case 'w':
-                    case 'W':
-                    case 72:
-                        nuevaUbiAux.y = nuevaUbiAux.y + 2;
-                        break;
-                    case 's':
-                    case 'S':
-                    case 80:
-                        nuevaUbiAux.y = nuevaUbiAux.y - 2;
-                        break;
-                    // case '.':
-                    //     break;
-                    default:
-                        break;
-                }
-            break;
-
-            case 5:
-                switch (input){
-                    case 'd':
-                    case 'D':
-                    case 77:
-                        nuevaUbiAux.x = nuevaUbiAux.x + 2;
-                        break;
-                    case 'a':
-                    case 'A':
-                    case 75:
-                        nuevaUbiAux.x = nuevaUbiAux.x - 2;
-                        break;
-                    case 'w':
-                    case 'W':
-                    case 72:
-                        nuevaUbiAux.y = nuevaUbiAux.y + 1;
-                        break;
-                    case 's':
-                    case 'S':
-                    case 80:
-                        nuevaUbiAux.y = nuevaUbiAux.y - 1;
-                        break;
-                    // case '.':
-                    //     break;
-                    default:
-                        break;
-                }
-            break;
-        
-            default:
-            break;
-        }
-
-    }while (movimientoLimit[max - nuevaUbiAux.y][nuevaUbiAux.x] == '#' || proximo(nuevaUbiAux, actualUbi) == 2);
-
-    return nuevaUbiAux;
-}
-
-
-
-
-// FUNCION QUE DEVUELVE NUEVA UBI DE NDL CUANDO TE MOVES RESPETANDO LIMITES
-//                 input del      ubi actual                                    casa = 0
-//                 teclado        de ndl        escLimitCalle/Casa              calle = 1
-//                                                                              vecino1 = 3
-//                                                                              vecino2 = 4
-coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[max][max2], int casaOCalle) {
+//                 input del      ubi actual                                    casa = 10
+//                 teclado        de ndl        escLimitCalle/Casa              calle = 0
+//                                                                              vecino 1 = 1
+//                                                                              vecino 2 = 2
+//                                                                              vecino 3 = 3
+// 
+// WARNING: aunque algunos casos tengan el mismo comportamiento aun no los junto hasta
+//  terminar el juego o al menos terminar todos los minijuegos
+coor movimientoConInput(char input, coor actualUbi, char movimientoLimit[maxV][maxH], int casaOCalle) {
     coor nuevaUbiAux = actualUbi;
-    // isOk sirve para q no redibuje la escena si no entro un input correcto
-    int isOk;
 
-    do{
-        isOk = 1;
+    switch (casaOCalle){
+        
+        case 10:
+            switch (input){
+                case 'd':
+                case 'D':
+                case 77:
+                    nuevaUbiAux.x = nuevaUbiAux.x + 3;
+                    break;
+                case 'a':
+                case 'A':
+                case 75:
+                    nuevaUbiAux.x = nuevaUbiAux.x - 3;
+                    break;
+                case 'w':
+                case 'W':
+                case 72:
+                    nuevaUbiAux.y = nuevaUbiAux.y + 1;
+                    break;
+                case 's':
+                case 'S':
+                case 80:
+                    nuevaUbiAux.y = nuevaUbiAux.y - 1;
+                    break;
+                default:
+                    break;
+            }
+        break;
 
-        switch (casaOCalle){
+        case 0:
+            switch (input){
+                case 'd':
+                case 'D':
+                case 77:
+                    nuevaUbiAux.x = nuevaUbiAux.x + 2;
+                    break;
+                case 'a':
+                case 'A':
+                case 75:
+                    nuevaUbiAux.x = nuevaUbiAux.x - 2;
+                    break;
+                case 'w':
+                case 'W':
+                case 72:
+                    nuevaUbiAux.y = nuevaUbiAux.y + 1;
+                    break;
+                case 's':
+                case 'S':
+                case 80:
+                    nuevaUbiAux.y = nuevaUbiAux.y - 1;
+                    break;
+                default:
+                    break;
+            }
+        break;
 
-            case 5:
-                switch (input){
-                    case 'd':
-                    case 'D':
-                    case 77:
-                        nuevaUbiAux.x = nuevaUbiAux.x + 2;
-                        break;
-                    case 'a':
-                    case 'A':
-                    case 75:
-                        nuevaUbiAux.x = nuevaUbiAux.x - 2;
-                        break;
-                    case 'w':
-                    case 'W':
-                    case 72:
-                        nuevaUbiAux.y = nuevaUbiAux.y + 1;
-                        break;
-                    case 's':
-                    case 'S':
-                    case 80:
-                        nuevaUbiAux.y = nuevaUbiAux.y - 1;
-                        break;
-                    // case '.':
-                    //     break;
-                    default:
-                        break;
-                }
+        case 1:
+            switch (input){
+                case 'd':
+                case 'D':
+                case 77:
+                    nuevaUbiAux.x = nuevaUbiAux.x + 2;
+                    break;
+                // case 'a':
+                // case 'A':
+                // case 75:
+                //     nuevaUbiAux.x = nuevaUbiAux.x - 2;
+                //     break;
+                case 'w':
+                case 'W':
+                case 72:
+                    nuevaUbiAux.y = nuevaUbiAux.y + 2;
+                    break;
+                case 's':
+                case 'S':
+                case 80:
+                    nuevaUbiAux.y = nuevaUbiAux.y - 2;
+                    break;
+                default:
+                    break;
+            }
+        break;
+
+        case 2:
+            switch (input){
+                case 'd':
+                case 'D':
+                case 77:
+                    nuevaUbiAux.x = nuevaUbiAux.x + 5;
+                    break;
+                case 'a':
+                case 'A':
+                case 75:
+                    nuevaUbiAux.x = nuevaUbiAux.x - 5;
+                    break;
+                case 'w':
+                case 'W':
+                case 72:
+                    nuevaUbiAux.y = nuevaUbiAux.y + 2;
+                    break;
+                case 's':
+                case 'S':
+                case 80:
+                    nuevaUbiAux.y = nuevaUbiAux.y - 2;
+                    break;
+                default:
+                    break;
+            }
+        break;
+
+        case 3:
+            switch (input){
+                case 'd':
+                case 'D':
+                case 77:
+                    nuevaUbiAux.x = nuevaUbiAux.x + 2;
+                    break;
+                case 'a':
+                case 'A':
+                case 75:
+                    nuevaUbiAux.x = nuevaUbiAux.x - 2;
+                    break;
+                case 'w':
+                case 'W':
+                case 72:
+                    nuevaUbiAux.y = nuevaUbiAux.y + 1;
+                    break;
+                case 's':
+                case 'S':
+                case 80:
+                    nuevaUbiAux.y = nuevaUbiAux.y - 1;
+                    break;
+                default:
+                    break;
+            }
+        break;
+
+        default:
             break;
-            
-            default:
-                switch (input){
-                    case 'd':
-                    case 'D':
-                    case 77:
-                        nuevaUbiAux.x = nuevaUbiAux.x + (3 - casaOCalle);
-                        break;
-                    case 'a':
-                    case 'A':
-                    case 75:
-                        nuevaUbiAux.x = nuevaUbiAux.x - (3 - casaOCalle);
-                        break;
-                    case 'w':
-                    case 'W':
-                    case 72:
-                        nuevaUbiAux.y = nuevaUbiAux.y + 1;
-                        break;
-                    case 's':
-                    case 'S':
-                    case 80:
-                        nuevaUbiAux.y = nuevaUbiAux.y - 1;
-                        break;
-                    case '.':
-                        break;
-                    default:
-                        isOk = 0;
-                        input = getch();
-                        break;
-                }
-            break;
-        }
-    // }while (actualUbi.x == nuevaUbiAux.x && actualUbi.y == nuevaUbiAux.y);
-    }while (isOk == 0);
-    
+    }
 
-    if(movimientoLimit[max - nuevaUbiAux.y][nuevaUbiAux.x] == '#') {
+    if(movimientoLimit[maxV - nuevaUbiAux.y][nuevaUbiAux.x] == '#') {
         return actualUbi;
     } else {
         return nuevaUbiAux;
@@ -699,7 +638,7 @@ int proximoAbeja(coor ndl, coor abeja){
 
 
 // DEVUELVE UNA UBI RANDOM DENTRO DE LOS LIMITES
-coor randomUbi(coor abeja, char limit[max][max2]){ 
+coor randomUbi(coor abeja, char limit[maxV][maxH]){ 
 	// srand(time(NULL));//Sirve para q rand() no de siempre los mismos numeros randoms
     coor nuevaUbi;
     
@@ -707,7 +646,7 @@ coor randomUbi(coor abeja, char limit[max][max2]){
     nuevaUbi.y = abeja.y + (rand() % 3) - 1;
 
     // si nuevaUbi en calleLimit es un # entonces retrun abeja
-    if(limit[max - nuevaUbi.y][nuevaUbi.x] == '#') {
+    if(limit[maxV - nuevaUbi.y][nuevaUbi.x] == '#') {
         return abeja;
     } else {
         return nuevaUbi;
@@ -783,13 +722,13 @@ void debugStringCoor(char msj[100], coor ubi){
 	fclose(errors);
 }
 
-void debugEscena(char escena[max][max2]){
+void debugEscena(char escena[maxV][maxH]){
     FILE *errors;
     errors = fopen("errors.txt", "a");
 
-    char *escenaFila[max2];
+    char *escenaFila[maxH];
 
-    for(int i = 0; i < max; i++){
+    for(int i = 0; i < maxV; i++){
 
         // escenaFila = &escena[0][i];
         escenaFila[0] = &escena[i][0];

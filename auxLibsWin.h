@@ -10,6 +10,9 @@
 #include <corecrt_stdio_config.h>
 #include <stddef.h>
 
+// Para el Sleep(n)
+#include <windows.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -324,3 +327,7 @@ void cls() {
 // velocity es muy importante para ajustar la velocidad del juego segun el sistema operativo donde se corre.
 //  
 #define velocity 1
+
+void sleep_ms(int ms){
+  Sleep(ms);
+}

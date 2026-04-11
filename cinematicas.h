@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <time.h>
 
-// #define max 16
-#define max 17
-// #define max2 60
-#define max2 62
+#define maxV 17
+#define maxH 62
 #define SIZE 200
 
 void cinematica(int l/*line*/, int mss);
@@ -44,16 +42,16 @@ void cinematica(int l/*line*/, int mss){
     // Con esto oculto la barra de hp durante las cinematicas
     printf("\n\n\t                                                                      \n");
     printf("\e[%iA", 3);
-    // Ahora en pivote vuelve a estar ubicado correctamente
+    // AmaxHa en pivote vuelve a estar ubicado correctamente
 
-    // Y ahora ubico el pivote para dibujar la cinemática como dibujo las escenas
+    // Y amaxHa ubico el pivote para dibujar la cinemática como dibujo las escenas
     printf("\e[%iA", 15);
 
 	FILE *f;
     char aux;
     int contador = 0;
-    char linea[max2+2];
-    char linea2[max2+1];
+    char linea[maxH+2];
+    char linea2[maxH+1];
     
     f = fopen("cinematicas.txt", "r");
     
@@ -64,7 +62,7 @@ void cinematica(int l/*line*/, int mss){
     }
     
     if(f != NULL){
-        for (contador = 0; contador <= max-3; contador++){
+        for (contador = 0; contador <= maxV-3; contador++){
 			printf("                              ");
             fgets(linea, sizeof(linea), f);
 			printf("%.60s", linea+1);

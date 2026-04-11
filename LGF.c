@@ -168,7 +168,6 @@ int main() {
 			case 4:
 				// GUARDAR PARTIDA
 				guardarPartida(&noviaDeLisa, 1);
-				freeze_ms(1500);
 				break;
 
 			case 5:
@@ -181,7 +180,6 @@ int main() {
                 break;
 		};
 	}while(menuOptionFocus != 7);
-
 }
 
 
@@ -301,5 +299,4 @@ void deleteSaveMenu(){
 		}
 		actualGame.ubi.y = 0;
 	}
-
 }
