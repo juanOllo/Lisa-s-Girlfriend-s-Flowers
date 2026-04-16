@@ -274,11 +274,10 @@ int menuDeCasa(){
 
 			// SALIO A LA CALLE POR LA PUERTA.
             case 1:
-
 				// ESTE IF NO TE DEJA SALIR DE CASA CON 0 DE ENERGIA.
 				if(noviaDeLisa.hp <= 0) {
-					noviaDeLisa.ubi.x = noviaDeLisa.ubi.x - 6;
-
+					noviaDeLisa.ubi.x = noviaDeLisa.ubi.x - 3;
+			        estadoEnCasa = dibujarEscena(listaDeEscenas[0].escVisual, 1);
 				} else {
 					noviaDeLisa.ubi = (coor){11, 7};
 					noviaDeLisa.calleLoc = 1;
@@ -317,7 +316,6 @@ int menuDeCasa(){
         }
 
 		casaInput = getch();
-		// sleep_ms(30);
 
 		if (casaInput == '.' || casaInput == '\033')
 			return 6;		
@@ -381,15 +379,14 @@ int menuDeCalle (){
 		entyCoor[3] = (coor){45, 5};	//abeja 3
 		// Podria hacer q se guarden las ubis en el actualGame para q no se reinicien las ubis cuando abris el menu
 		// 	o no permitir abrir el menu en la calle con abejas
-		// 	sin duda quedaria mejor guardar las ubis pero seria mucho trabajo cargarlas a cada rato
+		// 	Sin duda quedaria mejor guardar las ubis pero seria mucho trabajo cargarlas a cada rato
 	}
 
 	// Mientras no impactes con nada va a seguir esperando inputs
 	while(impactoConEntidad == 0){
-		// debugNdlData(&noviaDeLisa);
 
-		calleInput = getch();
 		sleep_ms(50);
+		calleInput = getch();
 
 		if (calleInput == '.' || calleInput == '\033'){
 			// Detener el thread de dibujo
@@ -778,10 +775,8 @@ int vecinoGameplay(){
 			pthread_create(&hiloEntidades, NULL, threadActualizarUbisDeObstaculos, NULL);
 
 			while (impactoConEntidad == 0){
-				sleep_ms(50);
 
 				noviaDeLisa.ubi = movimientoConInput(getch(), noviaDeLisa.ubi, listaDeEscenas[5].escLimit, 1);
-				// sleep_ms(100); // Pequeña pausa para evitar que el thread de dibujo consuma demasiados recursos
 
 				// CHECKEA SI LLEGASTE AL VECINO
 				if (noviaDeLisa.ubi.x > 50){
@@ -912,7 +907,6 @@ int vecinoGameplay(){
 			pthread_create(&hiloTimeSwitch, NULL, threadTimeSwitch, &loc5);
 
 			while (impactoConEntidad == 0){
-				sleep_ms(50);
 
 				noviaDeLisa.ubi = movimientoConInput(getch(), noviaDeLisa.ubi, listaDeEscenas[7].escLimit, 3);
 				// sleep_ms(100); // Pequeña pausa para evitar que el thread de dibujo consuma demasiados recursos
@@ -930,6 +924,47 @@ int vecinoGameplay(){
 			pthread_join(hiloDibujo3, NULL);
 			pthread_join(hiloTimeSwitch, NULL);
 			timeSwitch = 0;
+
+			noviaDeLisa.ubi = auxUbi;
+
+			return impactoConEntidad;
+			break;
+
+		case 4:
+			// CUARTO VECINO
+			noviaDeLisa.ubi = (coor){12, 8};
+			actualizarHP(noviaDeLisa.hp);
+			cargarEscenasConAlternativa(listaDeEscenas[8].escVisual, listaDeEscenas[8].escVisualAlt, listaDeEscenas[8].escLimit, 375);
+			// char gameplayInput;
+
+			// THREADS
+			// seguirDibujando = true;
+			// impactoConEntidad = 0;
+			// pthread_t hiloDibujo3;
+			// pthread_t hiloTimeSwitch;
+			// int loc5 = 5;
+			// pthread_create(&hiloDibujo3, NULL, threadDibujoVecino, &loc5);
+			// pthread_create(&hiloTimeSwitch, NULL, threadTimeSwitch, &loc5);
+
+			while (impactoConEntidad == 0){
+
+				dibujarEscena(listaDeEscenas[8].escVisual, 6);
+				noviaDeLisa.ubi = movimientoConInput(getch(), noviaDeLisa.ubi, listaDeEscenas[8].escLimit, 3);
+				// sleep_ms(100); // Pequeña pausa para evitar que el thread de dibujo consuma demasiados recursos
+
+				// CHECKEA SI LLEGASTE AL VECINO
+				if (noviaDeLisa.ubi.x >= 48){
+					impactoConEntidad = 2;
+					// sleep_ms(100);
+					// cinematica(273, 2000);
+				}
+			}
+
+			// Detener el thread de dibujo
+			// seguirDibujando = false;
+			// pthread_join(hiloDibujo3, NULL);
+			// pthread_join(hiloTimeSwitch, NULL);
+			// timeSwitch = 0;
 
 			noviaDeLisa.ubi = auxUbi;
 
@@ -1343,6 +1378,48 @@ int dibujarEscena(char d[maxV][maxH], int loc){
 				sleep_ms(200);
 				impactoConEntidad = 1;
 			}
+
+			break;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+		case 6:											//DIBUJA LA ESCENA DEL VECINO 4
+
+			// ESTE FOR SOLO DIBUJA LA ESCENA
+            for(int i = maxV-1; i > 1; i--){
+                printf("                              ");
+				
+                for(int j = 1; j < maxH-1; j++){
+					if((j == (noviaDeLisa.ubi.x))){
+						if (i == noviaDeLisa.ubi.y+2 || i == noviaDeLisa.ubi.y-2){
+							printf("\033[2D");
+							// printf("      ");
+							printf("%.6s", listaDeEscenas[8].escVisualAlt[maxV-i]+(j-2));
+							j = j+3;
+						} else if (i == noviaDeLisa.ubi.y+1 || i == noviaDeLisa.ubi.y-1){
+							printf("\033[3D");
+							// printf("        ");
+							printf("%.8s", listaDeEscenas[8].escVisualAlt[maxV-i]+(j-3));
+							j = j+4;
+						} else if (i == noviaDeLisa.ubi.y){
+							printf("\033[3D");
+							// printf("   ");
+							printf("%.3s", listaDeEscenas[8].escVisualAlt[maxV-i]+(j-3));
+							printNdl(noviaDeLisa.colorL);
+							printf("*");
+							// printf("   ");
+							printf("%.3s", listaDeEscenas[8].escVisualAlt[maxV-i]+(j+2));
+							j = j+4;
+						} else{
+                        	printf("%c", d[maxV-i][j]);
+						}
+
+                    } else{
+                        printf("%c", d[maxV-i][j]);
+                    }
+                }
+				// este prntf es para borrar el obstaculo q se buguea a la derecha del vecino
+                printf("\n");
+            }
 
 			break;
 

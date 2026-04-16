@@ -14,6 +14,7 @@ void freeze_ms(int ms);
 void agarrarFlorCinematica(){
     cinematica(766, 700);
     cinematica(783, 1000);
+    // cinematica(1021, 1500);
 }
 
 void entregar2daFlorCinematica(){

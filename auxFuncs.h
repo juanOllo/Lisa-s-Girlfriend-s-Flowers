@@ -199,9 +199,6 @@ void cambiarCalleAnim(char escena[maxV][maxH], char escena2[maxV][maxH], char di
         default:
             break;
     }
-
-    
-    
 }
 
 
@@ -310,6 +307,7 @@ void cargarEscenasConAlternativa(char escenaVisual[maxV][maxH], char escenaVisua
 // Guarda TODOS LOS DATOS DE NDL EN save.txt
 // typeSabe = 0 para guardado automatico
 //          = 1 para guardado manual
+//          = 2 para guardar solo el color
 void guardarPartida(Player *ndl, int typeSabe){
 
     char toSaveArray[18];
@@ -337,6 +335,7 @@ void guardarPartida(Player *ndl, int typeSabe){
     sprintf(&toSaveArray[5], "%d", ndl->lucides[2]);
     sprintf(&toSaveArray[6], "%d", ndl->lucides[3]);
 
+    // ndl tiene maximo 80 de hp
     switch (ndl->hp){
         // case 100:
         //     sprintf(&toSaveArray[7], "%d", ndl->hp);
@@ -400,7 +399,6 @@ void guardarPartida(Player *ndl, int typeSabe){
         printf("##");
         sleep_ms(500);
     }
-    
 }
 
 
@@ -434,7 +432,6 @@ void leerEscuchar(int cont){
 	}//while(i != 0);
 	printf("\t%s\n", dialogo);
 	//printf("\nTermina escuchar.\n");
-
 }
 
 
@@ -651,7 +648,6 @@ coor randomUbi(coor abeja, char limit[maxV][maxH]){
     } else {
         return nuevaUbi;
     }
-
 }
 
 
